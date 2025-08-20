@@ -832,8 +832,15 @@ body::before {
     }
 }
 
-/* Enhanced Mobile Responsive Design for Pricing Section */
+/* Enhanced Mobile Responsive Design pour masquer carrousel et projets */
 @media (max-width: 768px) {
+    /* MASQUER COMPLÈTEMENT le carrousel et les projets sur mobile */
+    .carousel,
+    #projets,
+    .cards {
+        display: none !important;
+    }
+    
     /* Pricing Section Mobile Improvements */
     #tarifs {
         padding: 2rem 1rem;
@@ -946,6 +953,13 @@ body::before {
         padding: 2rem 1.5rem;
         max-height: 800px;
         background: rgba(255, 255, 255, 0.3);
+    }
+    
+    /* Supprimer tous les effets parallax/fade sur mobile */
+    .section {
+        transform: none !important;
+        opacity: 1 !important;
+        transition: none !important;
     }
 }
 
