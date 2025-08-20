@@ -416,9 +416,13 @@ body::before {
     margin-right: auto;
 }
 
-/* Sous-sections de tarifs - Espace augmenté de 30% */
+/* Sous-sections de tarifs - Espace augmenté + cadres fins */
 .pricing-subsection {
-    margin-bottom: 5rem; /* Augmenté de 3rem à 5rem (+66%) */
+    margin-bottom: 5rem; /* Espace entre sections */
+    padding: 2rem;
+    border: 1px solid rgba(166, 115, 85, 0.2); /* Cadre fin autour de chaque section */
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.05); /* Fond très léger */
 }
 
 .pricing-subsection:last-child {
