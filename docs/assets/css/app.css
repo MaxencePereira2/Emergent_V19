@@ -2451,66 +2451,61 @@ body::before {
     }
 }
 
-/* === FIX ALIGNEMENT PUCES & COCHES — ALESIUM === */
-/* Normalisation zone listes (cartes/offres/bullets) */
-.card ul,
-.bullets {
-  margin: .5rem 0;
-  padding-left: 0;              /* évite double indentation */
-}
-
-/* Base li : suppression des puces natives + grille 2 colonnes (icône + texte) */
+/* === SUPPRESSION COMPLÈTE DES MARQUEURS — ALESIUM === */
+/* Suppression totale de tous les marqueurs et puces */
 .card ul li,
-.bullets li {
-  list-style: none;             /* neutralise puces natives */
-  margin: .35rem 0;
+.bullets li,
+.detail-columns li {
+  list-style: none !important;
+  margin: 0.5rem 0;
+  padding: 0 !important;
   line-height: 1.5;
-  display: grid;                /* garantit l'alignement en haut de la 1ère ligne */
-  grid-template-columns: 1.1em 1fr;
-  align-items: start;
-  column-gap: .5em;
+  display: block;
+  text-align: left;
 }
 
-/* Marqueur par défaut = • (point plein), stable sur multi-lignes */
+/* Suppression de tous les ::before marqueurs */
 .card ul li::before,
-.bullets li::before {
-  content: "•";
-  font-weight: 700;
-  line-height: 1;               /* évite la dérive verticale */
-  transform: translateY(.15em); /* micro-ajustement optique */
-  display: inline-block;
+.bullets li::before,
+.detail-columns li::before,
+.detail-left li::before,
+.detail-right li::before {
+  display: none !important;
+  content: "" !important;
 }
 
-/* Variante « listes à coches » : appliquer .list--check sur les UL concernées si HTML le permet */
-.list--check {
-  list-style: none;
-  padding-left: 0;
-}
-.list--check li {
-  grid-template-columns: 1.2em 1fr;
-}
-.list--check li::before {
-  content: "✓";
-  font-weight: 600;
-  font-size: .95em;
-  color: var(--accent);         /* ou var(--primary) selon charte */
-  line-height: 1;
-  transform: translateY(.1em);
-  display: inline-block;
-}
-
-/* Filets de sécurité — neutralisation styles contradictoires hérités */
+/* Suppression des ::marker natifs */
 .card ul li::marker,
-.bullets li::marker { content: ""; }       /* empêche double puce si list-style:disc persiste */
-.card ul, .card ol {
-  padding-inline-start: 0;                 /* supprime indentation UA ou thèmes */
-  margin-left: 0;
+.bullets li::marker,
+.detail-columns li::marker {
+  content: "" !important;
+  display: none !important;
 }
-/* Si des icônes SVG inline sont utilisées, on les cale proprement */
-.card ul li svg,
-.bullets li svg {
-  width: 1em; height: 1em;
-  vertical-align: top;                     /* évite l'ancrage sur baseline */
-  margin-top: .2em;
+
+/* Reset complet des listes */
+.card ul,
+.bullets,
+.detail-columns ul {
+  list-style: none !important;
+  padding: 0 !important;
+  margin: 0.5rem 0 !important;
 }
-/* === FIN FIX === */
+
+/* === SUPPRESSION ESPACE BLANC SOUS "VOIR LE DÉTAIL" === */
+.card-detail {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
+.card-toggle {
+  margin-bottom: 0 !important;
+  border-bottom: none !important;
+}
+
+.card-detail.open {
+  padding-top: 1rem !important;
+  margin-top: 0 !important;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* === FIN SUPPRESSIONS === */
