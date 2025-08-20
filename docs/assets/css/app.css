@@ -330,29 +330,48 @@ body::before {
     box-shadow: 0 10px 30px rgba(227, 220, 210, 0.3);
 }
 
+/* Section standard - Désactivation parallax sur mobile */
 .section {
-    max-width: 1400px;
-    margin: 56px auto; /* Réduit de 80px à 56px (30% de rapprochement) */
-    padding: 60px 40px; /* Réduit de 80px à 60px */
-    background: var(--surface);
-    border-radius: 0;
+    max-width: 1200px;
+    margin: 80px auto;
+    padding: 0 32px;
     position: relative;
-    overflow: hidden;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
     
-    /* Parallaxe entre sections */
+    /* Parallax désactivé sur mobile par défaut */
     transform: translateY(0);
     opacity: 1;
-    transition: transform 0.6s ease-out, opacity 0.6s ease-out;
 }
 
-.section.section-enter {
-    transform: translateY(10%); /* Réduit de 30% à 10% */
-    opacity: 0.3;
+/* Section tarifs - espacement corrigé avec FAQ */
+#tarifs {
+    margin-bottom: 6rem; /* Plus d'espace avant FAQ */
 }
 
-.section.section-visible {
-    transform: translateY(0);
-    opacity: 1;
+/* Réglage de l'espacement FAQ */
+#faq {
+    margin-top: 6rem; /* Plus d'espace après tarifs */
+}
+
+/* Parallax uniquement sur desktop */
+@media (min-width: 769px) {
+    .section {
+        transition: transform 0.6s ease-out, opacity 0.6s ease-out;
+    }
+    
+    /* Seulement lors du scroll sur desktop */
+    .section.parallax-hidden {
+        transform: translateY(5%); /* Réduit drastiquement l'effet */
+        opacity: 0.7;
+    }
+    
+    .section.parallax-visible {
+        transform: translateY(0);
+        opacity: 1;
+    }
 }
 
 /* Couleurs spécifiques pour chaque section - style Petralithe */
@@ -397,19 +416,43 @@ body::before {
     margin-right: auto;
 }
 
-/* Sous-sections de tarifs */
+/* Sous-sections de tarifs - Espace augmenté de 30% */
 .pricing-subsection {
-    margin-bottom: 3rem;
+    margin-bottom: 5rem; /* Augmenté de 3rem à 5rem (+66%) */
 }
 
 .pricing-subsection:last-child {
     margin-bottom: 0;
 }
 
+/* Couleurs distinctes pour les trois catégories */
+.pricing-subsection:nth-child(1) .subsection-title {
+    color: #2d5a87; /* Bleu profond pour Accompagnement */
+}
+
+.pricing-subsection:nth-child(1) .subsection-title::after {
+    background: linear-gradient(90deg, #2d5a87, #4a90a4);
+}
+
+.pricing-subsection:nth-child(2) .subsection-title {
+    color: #8b4513; /* Brun cuivré pour Machines */  
+}
+
+.pricing-subsection:nth-child(2) .subsection-title::after {
+    background: linear-gradient(90deg, #8b4513, #cd853f);
+}
+
+.pricing-subsection:nth-child(3) .subsection-title {
+    color: #2d5a4e; /* Vert foncé pour Consulting */
+}
+
+.pricing-subsection:nth-child(3) .subsection-title::after {
+    background: linear-gradient(90deg, #2d5a4e, #5a9367);
+}
+
 .subsection-title {
     font-size: 1.5rem;
     font-weight: 600;
-    color: var(--copper);
     text-align: center;
     margin: 0 0 2rem 0;
     text-transform: uppercase;
@@ -425,7 +468,6 @@ body::before {
     transform: translateX(-50%);
     width: 60px;
     height: 2px;
-    background: linear-gradient(90deg, var(--copper), var(--warm-beige));
 }
 
 /* Grille des cartes tarifs - style premium */
@@ -581,17 +623,54 @@ body::before {
     padding: 2rem;
 }
 
-/* Colonnes détail - Fix text alignment */
+/* Colonnes détail - Fix alignement parfait */
 .detail-columns {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 2.5rem;
-    text-align: left; /* Ensure left alignment */
+    text-align: left;
 }
 
 .detail-left,
 .detail-right {
-    text-align: left; /* Force left alignment for all content */
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+}
+
+/* Assure l'alignement parfait de la colonne droite */
+.detail-right {
+    text-align: left; /* Force l'alignement à gauche pour la colonne droite */
+}
+
+.detail-left h5,
+.detail-right h5 {
+    text-align: left; /* Titre aligné à gauche dans les deux colonnes */
+    margin-bottom: 1rem;
+}
+
+.detail-columns ul {
+    text-align: left;
+    margin: 0;
+    padding-left: 0;
+}
+
+.detail-columns li {
+    text-align: left;
+    list-style: none;
+    position: relative;
+    padding-left: 1.2rem;
+    margin-bottom: 0.8rem;
+}
+
+.detail-columns li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: var(--copper);
+    font-weight: bold;
 }
 
 .detail-left h5,
@@ -753,8 +832,15 @@ body::before {
     }
 }
 
-/* Enhanced Mobile Responsive Design for Pricing Section */
+/* Enhanced Mobile Responsive Design pour masquer carrousel et projets */
 @media (max-width: 768px) {
+    /* MASQUER COMPLÈTEMENT le carrousel et les projets sur mobile */
+    .carousel,
+    #projets,
+    .cards {
+        display: none !important;
+    }
+    
     /* Pricing Section Mobile Improvements */
     #tarifs {
         padding: 2rem 1rem;
@@ -867,6 +953,13 @@ body::before {
         padding: 2rem 1.5rem;
         max-height: 800px;
         background: rgba(255, 255, 255, 0.3);
+    }
+    
+    /* Supprimer tous les effets parallax/fade sur mobile */
+    .section {
+        transform: none !important;
+        opacity: 1 !important;
+        transition: none !important;
     }
 }
 
@@ -1464,10 +1557,12 @@ body::before {
 
 .carousel .card img {
     width: 100%;
-    height: 200px;
+    height: 320px; /* Carré correspondant à min-width */
     object-fit: cover;
+    object-position: center;
     display: block;
     transition: transform 0.3s ease;
+    border-radius: 8px 8px 0 0;
 }
 
 .carousel .card:hover img {
@@ -1501,8 +1596,10 @@ body::before {
 
 .gallery img {
     width: 100%;
+    max-width: 1920px; /* Limite la taille max des images */
     height: 200px;
     object-fit: cover;
+    object-position: center;
     border-radius: 12px;
     border: 1px solid var(--border);
     transition: transform 0.3s ease;
@@ -1836,6 +1933,61 @@ body::before {
 .recall-form,
 .tally-wrap {
     display: none;
+}
+
+/* Projet detail avec bouton de fermeture */
+.project-detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1.5rem;
+}
+
+.project-detail-header h2 {
+    margin: 0;
+    flex-grow: 1;
+}
+
+.close-project-btn {
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-left: 1rem;
+    flex-shrink: 0;
+}
+
+.close-project-btn:hover {
+    background: #f5f5f5;
+    border-color: rgba(0, 0, 0, 0.2);
+    transform: scale(1.05);
+}
+
+.close-project-btn svg {
+    color: #666;
+}
+
+.project-detail-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+    flex-wrap: wrap;
+}
+
+.close-project-btn-text {
+    background: var(--copper) !important;
+    color: white !important;
+}
+
+.close-project-btn-text:hover {
+    background: #8b4513 !important;
+    transform: translateY(-2px);
 }
 
 /* Styles pour la lightbox des images de projets */

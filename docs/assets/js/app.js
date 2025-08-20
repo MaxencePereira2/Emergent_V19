@@ -660,7 +660,15 @@
             : '';
 
         detail.innerHTML = `
-            <h2>${p.title}</h2>
+            <div class="project-detail-header">
+                <h2>${p.title}</h2>
+                <button class="close-project-btn" onclick="hideDetail()" title="Fermer le projet">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
             <p class="muted">${p.summary || ''}</p>
             ${imageGallery}
             <div class="cols">
@@ -675,7 +683,10 @@
                     <p>${p.time_spent || 'Données non disponibles'}</p>
                 </div>
             </div>
-            <p><a class="btn" href="#projets">← Revenir aux projets</a></p>
+            <div class="project-detail-actions">
+                <button class="btn close-project-btn-text" onclick="hideDetail()">← Fermer le projet</button>
+                <a class="btn" href="#projets">← Revenir aux projets</a>
+            </div>
         `;
         
         // Add gallery listeners after rendering
@@ -831,52 +842,54 @@
         });
     });
 
-    // Parallaxe entre sections (-10% à 0%) - EXCLUANT la section "qui je suis"
+    // Parallax entre sections - Desktop uniquement
     function initSectionParallax() {
-        const sections = document.querySelectorAll('.section:not(#presentation)'); // Exclure la section "qui je suis"
+        // Vérifier si on est sur desktop
+        if (window.innerWidth <= 768) return; // Pas de parallax sur mobile
         
-        // Initialiser toutes les sections en mode "enter"
+        const sections = document.querySelectorAll('.section');
+        
+        // Initialiser toutes les sections en mode "hidden"
         sections.forEach(section => {
-            section.classList.add('section-enter');
+            if (section.id !== 'presentation') { // Exclure "qui je suis"
+                section.classList.add('parallax-hidden');
+            }
         });
-        
+
         function updateSectionParallax() {
-            const scrollY = window.pageYOffset;
-            const windowHeight = window.innerHeight;
+            // Pas de parallax sur mobile
+            if (window.innerWidth <= 768) return;
             
+            const scrollY = window.pageYOffset;
+            const screenHeight = window.innerHeight;
+            const screenCenter = scrollY + screenHeight / 2;
+
             sections.forEach(section => {
-                const sectionTop = section.offsetTop;
-                const sectionHeight = section.offsetHeight;
+                if (section.id === 'presentation') return; // Exclure "qui je suis"
+                
+                const rect = section.getBoundingClientRect();
+                const sectionTop = rect.top + scrollY;
+                const sectionHeight = rect.height;
                 const sectionCenter = sectionTop + sectionHeight / 2;
-                
-                // Calculer la distance par rapport au centre de l'écran
-                const screenCenter = scrollY + windowHeight / 2;
+
+                // Distance entre le centre de l'écran et le centre de la section
                 const distanceFromCenter = Math.abs(screenCenter - sectionCenter);
-                
-                // Si la section est proche du centre de l'écran
-                if (distanceFromCenter < windowHeight * 0.8) {
-                    // Calculer le pourcentage de visibilité (0 = loin, 1 = au centre)
-                    const visibility = Math.max(0, 1 - (distanceFromCenter / (windowHeight * 0.8)));
-                    
-                    // Appliquer la transformation de -10% à 0%
-                    const translateY = (1 - visibility) * 10; // Réduit de 30 à 10
-                    const opacity = 0.3 + (visibility * 0.7);
-                    
-                    section.style.transform = `translateY(${translateY}%)`;
-                    section.style.opacity = opacity;
-                    
-                    if (visibility > 0.7) {
-                        section.classList.remove('section-enter');
-                        section.classList.add('section-visible');
+                const threshold = screenHeight * 0.3; // 30% de la hauteur d'écran
+
+                if (distanceFromCenter < threshold) {
+                    // Section proche du centre, la rendre visible
+                    if (section.classList.contains('parallax-hidden')) {
+                        section.classList.remove('parallax-hidden');
+                        section.classList.add('parallax-visible');
                     }
                 } else {
-                    // Section trop loin, la garder en mode "enter"
-                    section.classList.remove('section-visible');
-                    section.classList.add('section-enter');
+                    // Section trop loin, la garder en mode "hidden"
+                    section.classList.remove('parallax-visible');
+                    section.classList.add('parallax-hidden');
                 }
             });
         }
-        
+
         // Écouter le scroll avec throttling
         let ticking = false;
         function onScroll() {
@@ -888,17 +901,15 @@
                 ticking = true;
             }
         }
-        
+
         window.addEventListener('scroll', onScroll);
-        
-        // Appel initial
-        updateSectionParallax();
+        updateSectionParallax(); // Initial call
     }
-    
-    // Initialiser la parallaxe des sections
-    document.addEventListener('DOMContentLoaded', () => {
+
+    // Initialiser la parallax uniquement sur desktop
+    if (window.innerWidth > 768) {
         setTimeout(initSectionParallax, 100);
-    });
+    }
 
     // Add loading animation for images
     document.addEventListener('DOMContentLoaded', () => {
