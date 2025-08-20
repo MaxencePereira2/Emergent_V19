@@ -660,7 +660,15 @@
             : '';
 
         detail.innerHTML = `
-            <h2>${p.title}</h2>
+            <div class="project-detail-header">
+                <h2>${p.title}</h2>
+                <button class="close-project-btn" onclick="hideDetail()" title="Fermer le projet">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
             <p class="muted">${p.summary || ''}</p>
             ${imageGallery}
             <div class="cols">
@@ -675,7 +683,10 @@
                     <p>${p.time_spent || 'Données non disponibles'}</p>
                 </div>
             </div>
-            <p><a class="btn" href="#projets">← Revenir aux projets</a></p>
+            <div class="project-detail-actions">
+                <button class="btn close-project-btn-text" onclick="hideDetail()">← Fermer le projet</button>
+                <a class="btn" href="#projets">← Revenir aux projets</a>
+            </div>
         `;
         
         // Add gallery listeners after rendering
