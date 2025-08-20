@@ -1933,6 +1933,61 @@ body::before {
     display: none;
 }
 
+/* Projet detail avec bouton de fermeture */
+.project-detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1.5rem;
+}
+
+.project-detail-header h2 {
+    margin: 0;
+    flex-grow: 1;
+}
+
+.close-project-btn {
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-left: 1rem;
+    flex-shrink: 0;
+}
+
+.close-project-btn:hover {
+    background: #f5f5f5;
+    border-color: rgba(0, 0, 0, 0.2);
+    transform: scale(1.05);
+}
+
+.close-project-btn svg {
+    color: #666;
+}
+
+.project-detail-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+    flex-wrap: wrap;
+}
+
+.close-project-btn-text {
+    background: var(--copper) !important;
+    color: white !important;
+}
+
+.close-project-btn-text:hover {
+    background: #8b4513 !important;
+    transform: translateY(-2px);
+}
+
 /* Styles pour la lightbox des images de projets */
 .lightbox {
     position: fixed;
