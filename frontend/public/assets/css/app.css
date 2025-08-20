@@ -1557,10 +1557,12 @@ body::before {
 
 .carousel .card img {
     width: 100%;
-    height: 200px;
+    height: 320px; /* Carré correspondant à min-width */
     object-fit: cover;
+    object-position: center;
     display: block;
     transition: transform 0.3s ease;
+    border-radius: 8px 8px 0 0;
 }
 
 .carousel .card:hover img {
