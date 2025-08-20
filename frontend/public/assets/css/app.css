@@ -2030,7 +2030,48 @@ body::before {
     display: none;
 }
 
-/* Projet detail avec bouton de fermeture */
+/* Animation fluide pour l'ouverture et fermeture des projets */
+#projet-detail {
+    transition: all 0.5s ease;
+    transform: translateY(0);
+    opacity: 1;
+}
+
+#projet-detail.hidden {
+    transform: translateY(-20px);
+    opacity: 0;
+    pointer-events: none;
+}
+
+#projet-detail.opening {
+    animation: projectOpenAnimation 0.5s ease forwards;
+}
+
+#projet-detail.closing {
+    animation: projectCloseAnimation 0.4s ease forwards;
+}
+
+@keyframes projectOpenAnimation {
+    0% {
+        transform: translateY(-30px);
+        opacity: 0;
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes projectCloseAnimation {
+    0% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(-30px);
+        opacity: 0;
+    }
+}
 .project-detail-header {
     display: flex;
     justify-content: space-between;
