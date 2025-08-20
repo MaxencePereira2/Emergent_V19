@@ -429,34 +429,11 @@ body::before {
     margin-bottom: 0;
 }
 
-/* Couleurs distinctes pour les trois catégories */
-.pricing-subsection:nth-child(1) .subsection-title {
-    color: #2d5a87; /* Bleu profond pour Accompagnement */
-}
-
-.pricing-subsection:nth-child(1) .subsection-title::after {
-    background: linear-gradient(90deg, #2d5a87, #4a90a4);
-}
-
-.pricing-subsection:nth-child(2) .subsection-title {
-    color: #8b4513; /* Brun cuivré pour Machines */  
-}
-
-.pricing-subsection:nth-child(2) .subsection-title::after {
-    background: linear-gradient(90deg, #8b4513, #cd853f);
-}
-
-.pricing-subsection:nth-child(3) .subsection-title {
-    color: #2d5a4e; /* Vert foncé pour Consulting */
-}
-
-.pricing-subsection:nth-child(3) .subsection-title::after {
-    background: linear-gradient(90deg, #2d5a4e, #5a9367);
-}
-
+/* Couleur uniforme pour tous les titres de catégories */
 .subsection-title {
     font-size: 1.5rem;
     font-weight: 600;
+    color: var(--copper); /* Même couleur pour tous */
     text-align: center;
     margin: 0 0 2rem 0;
     text-transform: uppercase;
@@ -472,6 +449,7 @@ body::before {
     transform: translateX(-50%);
     width: 60px;
     height: 2px;
+    background: linear-gradient(90deg, var(--copper), var(--warm-beige)); /* Même ligne pour tous */
 }
 
 /* Grille des cartes tarifs - style premium */
