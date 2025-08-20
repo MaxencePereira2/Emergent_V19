@@ -2450,3 +2450,67 @@ body::before {
         height: 600px;
     }
 }
+
+/* === FIX ALIGNEMENT PUCES & COCHES — ALESIUM === */
+/* Normalisation zone listes (cartes/offres/bullets) */
+.card ul,
+.bullets {
+  margin: .5rem 0;
+  padding-left: 0;              /* évite double indentation */
+}
+
+/* Base li : suppression des puces natives + grille 2 colonnes (icône + texte) */
+.card ul li,
+.bullets li {
+  list-style: none;             /* neutralise puces natives */
+  margin: .35rem 0;
+  line-height: 1.5;
+  display: grid;                /* garantit l'alignement en haut de la 1ère ligne */
+  grid-template-columns: 1.1em 1fr;
+  align-items: start;
+  column-gap: .5em;
+}
+
+/* Marqueur par défaut = • (point plein), stable sur multi-lignes */
+.card ul li::before,
+.bullets li::before {
+  content: "•";
+  font-weight: 700;
+  line-height: 1;               /* évite la dérive verticale */
+  transform: translateY(.15em); /* micro-ajustement optique */
+  display: inline-block;
+}
+
+/* Variante « listes à coches » : appliquer .list--check sur les UL concernées si HTML le permet */
+.list--check {
+  list-style: none;
+  padding-left: 0;
+}
+.list--check li {
+  grid-template-columns: 1.2em 1fr;
+}
+.list--check li::before {
+  content: "✓";
+  font-weight: 600;
+  font-size: .95em;
+  color: var(--accent);         /* ou var(--primary) selon charte */
+  line-height: 1;
+  transform: translateY(.1em);
+  display: inline-block;
+}
+
+/* Filets de sécurité — neutralisation styles contradictoires hérités */
+.card ul li::marker,
+.bullets li::marker { content: ""; }       /* empêche double puce si list-style:disc persiste */
+.card ul, .card ol {
+  padding-inline-start: 0;                 /* supprime indentation UA ou thèmes */
+  margin-left: 0;
+}
+/* Si des icônes SVG inline sont utilisées, on les cale proprement */
+.card ul li svg,
+.bullets li svg {
+  width: 1em; height: 1em;
+  vertical-align: top;                     /* évite l'ancrage sur baseline */
+  margin-top: .2em;
+}
+/* === FIN FIX === */
