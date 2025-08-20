@@ -351,7 +351,8 @@ class ContactFormTester:
             self.test_required_field_validation,
             self.test_optional_phone_field,
             self.test_get_contact_forms,
-            self.test_error_handling
+            self.test_error_handling,
+            self.test_emailjs_integration  # Add EmailJS test
         ]
         
         passed = 0
