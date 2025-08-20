@@ -443,20 +443,101 @@ body::before {
     background: linear-gradient(90deg, var(--copper), var(--warm-beige)); /* Même ligne pour tous */
 }
 
-/* Grille des cartes tarifs - 3 colonnes pour réduire l'espace */
+/* Grille des cartes tarifs - Adaptative selon le nombre de cartes */
 .pricing-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr); /* Force 3 colonnes */
-    gap: 1.5rem; /* Réduit l'espace entre les cartes */
+    gap: 1.5rem;
     max-width: 1200px;
     margin: 0 auto;
+    justify-items: center; /* Centre les éléments */
 }
 
-/* Responsive : retour à 2 colonnes sur tablette */
-@media (max-width: 1024px) and (min-width: 769px) {
+/* 1 carte : prend toute la largeur */
+.pricing-grid:has(.pricing-card:only-child) {
+    grid-template-columns: 1fr;
+}
+
+.pricing-grid .pricing-card:only-child {
+    width: 100%;
+    max-width: 600px; /* Limite pour éviter qu'elle soit trop large */
+}
+
+/* 2 cartes : centrées et prennent toute la place */
+.pricing-grid:has(.pricing-card:nth-child(2):last-child) {
+    grid-template-columns: 1fr 1fr;
+    justify-content: center;
+}
+
+/* 3 cartes : en ligne (comportement actuel) */
+.pricing-grid:has(.pricing-card:nth-child(3):last-child) {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+/* 4 cartes : 2x2 lignes */
+.pricing-grid:has(.pricing-card:nth-child(4):last-child) {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, auto);
+}
+
+/* Plus de 4 cartes : grille flexible */
+.pricing-grid:has(.pricing-card:nth-child(n+5)) {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+/* Alternative pour navigateurs ne supportant pas :has() */
+@supports not (selector(:has(*))) {
+    /* Fallback : utilise grid-template-columns flexible */
     .pricing-grid {
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    }
+    
+    /* Classes spécifiques qu'on peut ajouter manuellement si besoin */
+    .pricing-grid.single-card {
+        grid-template-columns: 1fr;
+        justify-items: center;
+    }
+    
+    .pricing-grid.single-card .pricing-card {
+        width: 100%;
+        max-width: 600px;
+    }
+    
+    .pricing-grid.two-cards {
+        grid-template-columns: 1fr 1fr;
+        justify-content: center;
+    }
+    
+    .pricing-grid.three-cards {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .pricing-grid.four-cards {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Responsive : retour à 2 colonnes max sur tablette */
+@media (max-width: 1024px) and (min-width: 769px) {
+    .pricing-grid:has(.pricing-card:nth-child(3):last-child),
+    .pricing-grid:has(.pricing-card:nth-child(n+4)) {
         grid-template-columns: repeat(2, 1fr);
         gap: 2rem;
+    }
+}
+
+/* Mobile : toujours 1 colonne */
+@media (max-width: 768px) {
+    .pricing-grid {
+        grid-template-columns: 1fr !important;
+        gap: 2rem;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .pricing-card {
+        width: 100%;
+        max-width: none;
+        margin: 0 0.5rem;
     }
 }
 
