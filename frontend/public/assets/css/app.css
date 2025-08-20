@@ -541,7 +541,7 @@ body::before {
     }
 }
 
-/* Carte tarif - design haut de gamme gracz.fr */
+/* Carte tarif - design haut de gamme avec hauteur uniforme */
 .pricing-card {
     background: rgba(255, 255, 255, 0.95);
     border: 1px solid rgba(45, 55, 72, 0.1);
@@ -551,6 +551,11 @@ body::before {
     position: relative;
     overflow: hidden;
     cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    height: fit-content; /* Hauteur adaptative mais uniforme dans chaque ligne */
+    min-height: 400px; /* Hauteur minimum pour uniformité */
+    width: 100%;
 }
 
 .pricing-card::before {
