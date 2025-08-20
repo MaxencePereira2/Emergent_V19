@@ -857,8 +857,47 @@
         });
     });
 
+    // Adaptation automatique des grilles de tarifs selon le nombre de cartes
+    function adaptPricingGrids() {
+        const pricingGrids = document.querySelectorAll('.pricing-grid');
+        
+        pricingGrids.forEach(grid => {
+            const cards = grid.querySelectorAll('.pricing-card');
+            const cardCount = cards.length;
+            
+            // Supprimer les classes existantes
+            grid.classList.remove('single-card', 'two-cards', 'three-cards', 'four-cards');
+            
+            // Ajouter la classe appropriée selon le nombre de cartes
+            switch(cardCount) {
+                case 1:
+                    grid.classList.add('single-card');
+                    break;
+                case 2:
+                    grid.classList.add('two-cards');
+                    break;
+                case 3:
+                    grid.classList.add('three-cards');
+                    break;
+                case 4:
+                    grid.classList.add('four-cards');
+                    break;
+                default:
+                    // Plus de 4 cartes : comportement par défaut (3 colonnes)
+                    grid.classList.add('multiple-cards');
+            }
+            
+            console.log(`✓ Grid adapted: ${cardCount} card(s) in section`);
+        });
+    }
+
     // Parallax effects complètement désactivés
     // Plus d'effets de fade/parallax lors du défilement
+    
+    // Initialiser l'adaptation des grilles au chargement
+    document.addEventListener('DOMContentLoaded', () => {
+        setTimeout(adaptPricingGrids, 500);
+    });
 
     // Add loading animation for images
     document.addEventListener('DOMContentLoaded', () => {
