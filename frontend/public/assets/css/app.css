@@ -745,34 +745,35 @@ body::before {
 .detail-columns li {
     text-align: left !important;
     list-style: none;
-    position: relative;
-    padding-left: 4rem; /* Encore plus d'espace - 4rem */
-    margin: 0 0 1rem 0 !important;
+    margin: 0 0 0.8rem 0 !important;
     width: 100%;
-    display: block;
-    line-height: 1.6;
+    display: flex !important;
+    align-items: flex-start;
+    line-height: 1.5;
+    padding: 0 !important; /* Reset padding */
 }
 
+/* Créer la puce comme un élément séparé */
 .detail-columns li::before {
-    content: '• ';
-    position: absolute;
-    left: 1rem;
-    top: 0;
+    content: '→';
     color: var(--copper);
     font-weight: bold;
-    font-size: 1.2em;
-}
-
-/* Flèches pour la colonne gauche */
-.detail-left li::before {
-    content: '→ ';
-    color: var(--copper);
+    font-size: 1em;
+    margin-right: 1rem; /* Espace entre puce et texte */
+    flex-shrink: 0; /* La puce ne se réduit jamais */
+    width: auto;
+    position: static; /* Pas de position absolute */
 }
 
 /* Coches pour la colonne droite */
 .detail-right li::before {
-    content: '✓ ';
+    content: '✓';
     color: #28a745;
+}
+
+/* Le texte prend le reste de l'espace */
+.detail-columns li > * {
+    flex: 1;
 }
 
 .detail-left h5,
