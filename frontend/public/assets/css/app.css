@@ -736,6 +736,12 @@ body::before {
     list-style: none;
 }
 
+/* Espacement supplémentaire entre les sections de listes */
+.detail-left ul,
+.detail-right ul {
+    margin-bottom: 1.5rem !important;
+}
+
 .detail-columns li {
     text-align: left !important;
     list-style: none;
