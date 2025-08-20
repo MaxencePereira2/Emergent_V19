@@ -330,7 +330,7 @@ body::before {
     box-shadow: 0 10px 30px rgba(227, 220, 210, 0.3);
 }
 
-/* Section standard - Désactivation parallax sur mobile */
+/* Section standard - Aucun effet parallax */
 .section {
     max-width: 1200px;
     margin: 80px auto;
@@ -341,9 +341,10 @@ body::before {
     border-radius: 16px;
     border: 1px solid rgba(255, 255, 255, 0.2);
     
-    /* Parallax désactivé sur mobile par défaut */
-    transform: translateY(0);
-    opacity: 1;
+    /* Aucun effet - contraste constant */
+    transform: translateY(0) !important;
+    opacity: 1 !important;
+    transition: none !important;
 }
 
 /* Section tarifs - espacement corrigé avec FAQ */
@@ -356,22 +357,12 @@ body::before {
     margin-top: 6rem; /* Plus d'espace après tarifs */
 }
 
-/* Parallax uniquement sur desktop */
-@media (min-width: 769px) {
-    .section {
-        transition: transform 0.6s ease-out, opacity 0.6s ease-out;
-    }
-    
-    /* Seulement lors du scroll sur desktop */
-    .section.parallax-hidden {
-        transform: translateY(5%); /* Réduit drastiquement l'effet */
-        opacity: 0.7;
-    }
-    
-    .section.parallax-visible {
-        transform: translateY(0);
-        opacity: 1;
-    }
+/* Aucun effet parallax même sur desktop */
+.section.parallax-hidden,
+.section.parallax-visible {
+    transform: translateY(0) !important;
+    opacity: 1 !important;
+    transition: none !important;
 }
 
 /* Couleurs spécifiques pour chaque section - style Petralithe */
