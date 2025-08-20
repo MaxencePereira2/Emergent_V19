@@ -1053,16 +1053,18 @@ body::before {
     
     .detail-columns li {
         font-size: 0.95rem;
-        line-height: 1.6;
-        padding-left: 4rem; /* Même espacement généreux sur mobile */
-        margin: 0 0 1rem 0 !important;
+        line-height: 1.5;
+        padding: 0 !important;
+        margin: 0 0 0.6rem 0 !important;
         text-align: left !important;
+        display: flex !important;
+        align-items: flex-start;
     }
     
-    /* Puces mobiles plus espacées */
+    /* Mêmes puces sur mobile avec flexbox */
     .detail-columns li::before {
-        left: 1rem;
-        font-size: 1.1em;
+        margin-right: 0.8rem; /* Légèrement moins d'espace sur mobile */
+        flex-shrink: 0;
     }
     
     .card-detail.open {
