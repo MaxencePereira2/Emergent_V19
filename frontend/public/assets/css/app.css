@@ -1027,18 +1027,22 @@ body::before {
     .detail-left h5,
     .detail-right h5 {
         font-size: 1rem;
-        margin-bottom: 1rem;
+        margin: 0 0 1rem 0 !important;
+        padding: 0 !important;
         text-align: left !important;
     }
     
     .detail-columns ul {
         text-align: left !important;
+        margin: 0 !important;
+        padding: 0 !important;
     }
     
     .detail-columns li {
         font-size: 0.95rem;
         line-height: 1.5;
-        padding: 0.6rem 0;
+        padding-left: 1.2rem;
+        margin: 0 0 0.6rem 0 !important;
         text-align: left !important;
     }
     
