@@ -825,6 +825,13 @@ body::before {
         display: none !important;
     }
     
+    /* Sections avec cadres adaptés pour mobile */
+    .pricing-subsection {
+        margin-bottom: 3rem;
+        padding: 1.5rem 1rem; /* Padding réduit sur mobile */
+        border: 1px solid rgba(166, 115, 85, 0.3); /* Border un peu plus visible sur mobile */
+    }
+    
     /* Pricing Section Mobile Improvements */
     #tarifs {
         padding: 2rem 1rem;
@@ -836,10 +843,6 @@ body::before {
         margin-bottom: 2.5rem;
         text-align: center;
         padding: 0 0.5rem;
-    }
-    
-    .pricing-subsection {
-        margin-bottom: 3rem;
     }
     
     .subsection-title {
@@ -912,25 +915,25 @@ body::before {
     .detail-columns {
         grid-template-columns: 1fr;
         gap: 2rem;
-        text-align: left; /* Fix text alignment issue */
+        text-align: left !important;
     }
     
     .detail-left h5,
     .detail-right h5 {
         font-size: 1rem;
         margin-bottom: 1rem;
-        text-align: left; /* Ensure consistent alignment */
+        text-align: left !important;
     }
     
     .detail-columns ul {
-        text-align: left; /* Fix text alignment issue */
+        text-align: left !important;
     }
     
     .detail-columns li {
         font-size: 0.95rem;
         line-height: 1.5;
         padding: 0.6rem 0;
-        text-align: left; /* Fix text alignment issue */
+        text-align: left !important;
     }
     
     .card-detail.open {
@@ -939,8 +942,10 @@ body::before {
         background: rgba(255, 255, 255, 0.3);
     }
     
-    /* Supprimer tous les effets parallax/fade sur mobile */
-    .section {
+    /* Supprimer TOUS les effets sur mobile */
+    .section,
+    .section.parallax-hidden,
+    .section.parallax-visible {
         transform: none !important;
         opacity: 1 !important;
         transition: none !important;
