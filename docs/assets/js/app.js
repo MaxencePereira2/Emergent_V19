@@ -18,7 +18,7 @@
         location.href = `mailto:${EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     });
 
-    // Contact form handler
+    // Contact form handler with EmailJS integration
     const contactForm = document.getElementById('contact-form');
     const formStatus = document.querySelector('.form-status');
     
@@ -43,9 +43,8 @@
             submitBtn.disabled = true;
             
             try {
-                // Use the correct backend URL for the environment
+                // Step 1: Save to database via backend
                 const backendUrl = 'https://alesium-landing.preview.emergentagent.com';
-                
                 const response = await fetch(`${backendUrl}/api/contact`, {
                     method: 'POST',
                     headers: {
@@ -54,20 +53,24 @@
                     body: JSON.stringify(data)
                 });
                 
-                if (response.ok) {
-                    // Success
-                    formStatus.style.display = 'block';
-                    formStatus.style.color = '#2d6e3e';
-                    formStatus.textContent = 'Votre message a été envoyé avec succès ! Nous vous répondrons dans les plus brefs délais.';
-                    contactForm.reset();
-                } else {
-                    throw new Error('Erreur lors de l\'envoi du message');
+                if (!response.ok) {
+                    throw new Error('Erreur lors de l\'enregistrement');
                 }
+                
+                // Step 2: Send emails via EmailJS (client-side)
+                await sendEmailViaEmailJS(data);
+                
+                // Success
+                formStatus.style.display = 'block';
+                formStatus.style.color = '#2d6e3e';
+                formStatus.textContent = '✅ Votre message a été envoyé avec succès ! Nous vous répondrons dans les plus brefs délais. Un email de confirmation vous a été envoyé.';
+                contactForm.reset();
+                
             } catch (error) {
                 // Error
                 formStatus.style.display = 'block';
                 formStatus.style.color = '#d32f2f';
-                formStatus.textContent = 'Une erreur est survenue. Veuillez réessayer ou nous contacter directement par email.';
+                formStatus.textContent = '❌ Une erreur est survenue. Veuillez réessayer ou nous contacter directement par email.';
                 console.error('Contact form error:', error);
             } finally {
                 // Reset button
@@ -75,6 +78,81 @@
                 submitBtn.disabled = false;
             }
         });
+    }
+
+    // EmailJS integration function
+    async function sendEmailViaEmailJS(data) {
+        // EmailJS configuration
+        const emailJSConfig = {
+            serviceID: 'service_jc6o6xn',
+            notificationTemplateID: 'template_4ur9prj',
+            autoReplyTemplateID: 'template_tnqh3o9',
+            userID: 'kYuOmVqmEYAp7mfjU',
+            accessToken: 'kDN2xdpEqrTvCp2Ffwqa4'
+        };
+        
+        const timestamp = new Date().toLocaleString('fr-FR');
+        
+        try {
+            // Send notification email to Alesium
+            const notificationParams = {
+                to_email: 'contact@alesium.fr',
+                to_name: 'Alesium',
+                from_name: data.name,
+                from_email: data.email,
+                subject: data.subject,
+                message: data.message,
+                phone: data.phone || 'Non renseigné',
+                timestamp: timestamp,
+                site_name: 'Alesium.fr'
+            };
+            
+            await sendSingleEmailJS(emailJSConfig.serviceID, emailJSConfig.notificationTemplateID, notificationParams, emailJSConfig.userID, emailJSConfig.accessToken);
+            console.log('✅ Notification email sent to Alesium');
+            
+            // Send auto-reply confirmation to client
+            const autoReplyParams = {
+                client_name: data.name,
+                client_email: data.email,
+                subject: data.subject,
+                message: data.message,
+                phone: data.phone || 'Non renseigné',
+                timestamp: timestamp
+            };
+            
+            await sendSingleEmailJS(emailJSConfig.serviceID, emailJSConfig.autoReplyTemplateID, autoReplyParams, emailJSConfig.userID, emailJSConfig.accessToken);
+            console.log('✅ Auto-reply confirmation sent to client');
+            
+        } catch (error) {
+            console.error('❌ EmailJS error:', error);
+            throw error;
+        }
+    }
+    
+    // Helper function to send single email via EmailJS
+    async function sendSingleEmailJS(serviceID, templateID, templateParams, userID, accessToken) {
+        const payload = {
+            service_id: serviceID,
+            template_id: templateID,
+            user_id: userID,
+            template_params: templateParams,
+            accessToken: accessToken
+        };
+        
+        const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        });
+        
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`EmailJS API error: ${response.status} - ${errorText}`);
+        }
+        
+        return response.text();
     }
 
     // Lightbox functionality for project images
