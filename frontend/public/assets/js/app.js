@@ -854,74 +854,8 @@
         });
     });
 
-    // Parallax entre sections - Desktop uniquement
-    function initSectionParallax() {
-        // Vérifier si on est sur desktop
-        if (window.innerWidth <= 768) return; // Pas de parallax sur mobile
-        
-        const sections = document.querySelectorAll('.section');
-        
-        // Initialiser toutes les sections en mode "hidden"
-        sections.forEach(section => {
-            if (section.id !== 'presentation') { // Exclure "qui je suis"
-                section.classList.add('parallax-hidden');
-            }
-        });
-
-        function updateSectionParallax() {
-            // Pas de parallax sur mobile
-            if (window.innerWidth <= 768) return;
-            
-            const scrollY = window.pageYOffset;
-            const screenHeight = window.innerHeight;
-            const screenCenter = scrollY + screenHeight / 2;
-
-            sections.forEach(section => {
-                if (section.id === 'presentation') return; // Exclure "qui je suis"
-                
-                const rect = section.getBoundingClientRect();
-                const sectionTop = rect.top + scrollY;
-                const sectionHeight = rect.height;
-                const sectionCenter = sectionTop + sectionHeight / 2;
-
-                // Distance entre le centre de l'écran et le centre de la section
-                const distanceFromCenter = Math.abs(screenCenter - sectionCenter);
-                const threshold = screenHeight * 0.3; // 30% de la hauteur d'écran
-
-                if (distanceFromCenter < threshold) {
-                    // Section proche du centre, la rendre visible
-                    if (section.classList.contains('parallax-hidden')) {
-                        section.classList.remove('parallax-hidden');
-                        section.classList.add('parallax-visible');
-                    }
-                } else {
-                    // Section trop loin, la garder en mode "hidden"
-                    section.classList.remove('parallax-visible');
-                    section.classList.add('parallax-hidden');
-                }
-            });
-        }
-
-        // Écouter le scroll avec throttling
-        let ticking = false;
-        function onScroll() {
-            if (!ticking) {
-                requestAnimationFrame(() => {
-                    updateSectionParallax();
-                    ticking = false;
-                });
-                ticking = true;
-            }
-        }
-
-        window.addEventListener('scroll', onScroll);
-        updateSectionParallax(); // Initial call
-    }
-
-    // Initialiser la parallax uniquement sur desktop
-    if (window.innerWidth > 768) {
-        setTimeout(initSectionParallax, 100);
-    }
+    // Parallax effects complètement désactivés
+    // Plus d'effets de fade/parallax lors du défilement
 
     // Add loading animation for images
     document.addEventListener('DOMContentLoaded', () => {
