@@ -736,11 +736,17 @@ body::before {
     list-style: none;
 }
 
+/* Espacement supplémentaire entre les sections de listes */
+.detail-left ul,
+.detail-right ul {
+    margin-bottom: 1.5rem !important;
+}
+
 .detail-columns li {
     text-align: left !important;
     list-style: none;
     position: relative;
-    padding-left: 1.2rem;
+    padding-left: 2rem; /* Augmenté de 1.2rem à 2rem pour plus d'espace */
     margin: 0 0 0.8rem 0 !important;
     width: 100%;
     display: block;
@@ -750,17 +756,20 @@ body::before {
 .detail-columns li::before {
     content: '→';
     position: absolute;
-    left: 0;
+    left: 0.5rem; /* Décalé vers la droite pour éviter le bord */
     top: 0;
     color: var(--copper);
     font-weight: bold;
+    width: 1rem; /* Largeur fixe pour la puce */
 }
 
-/* Spécifique pour les coches dans la colonne droite */
+/* Spécifique pour les coches dans la colonne droite avec plus d'espace */
 .detail-right li::before {
     content: '✓';
     color: #28a745;
     font-weight: bold;
+    left: 0.5rem; /* Même position que les flèches */
+    width: 1rem;
 }
 
 .detail-left h5,
@@ -1041,9 +1050,15 @@ body::before {
     .detail-columns li {
         font-size: 0.95rem;
         line-height: 1.5;
-        padding-left: 1.2rem;
+        padding-left: 2rem; /* Même espacement sur mobile */
         margin: 0 0 0.6rem 0 !important;
         text-align: left !important;
+    }
+    
+    /* Puces mobiles avec bon espacement */
+    .detail-columns li::before {
+        left: 0.5rem; /* Même position que desktop */
+        width: 1rem;
     }
     
     .card-detail.open {
