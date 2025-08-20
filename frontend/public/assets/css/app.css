@@ -605,12 +605,13 @@ body::before {
     padding: 2rem;
 }
 
-/* Colonnes détail - Fix alignement parfait */
+/* Colonnes détail - Alignement parfait pour toutes les cartes */
 .detail-columns {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 2.5rem;
     text-align: left;
+    align-items: start; /* Alignement au début pour éviter l'étirement */
 }
 
 .detail-left,
@@ -620,31 +621,41 @@ body::before {
     flex-direction: column;
     justify-content: flex-start;
     align-items: flex-start;
+    width: 100%;
 }
 
-/* Assure l'alignement parfait de la colonne droite */
-.detail-right {
-    text-align: left; /* Force l'alignement à gauche pour la colonne droite */
+/* Force l'alignement parfait de tous les éléments */
+.detail-left *,
+.detail-right * {
+    text-align: left !important;
+    justify-self: start;
+    align-self: start;
 }
 
 .detail-left h5,
 .detail-right h5 {
-    text-align: left; /* Titre aligné à gauche dans les deux colonnes */
+    text-align: left !important;
     margin-bottom: 1rem;
+    width: 100%;
+    display: block;
 }
 
 .detail-columns ul {
-    text-align: left;
+    text-align: left !important;
     margin: 0;
     padding-left: 0;
+    width: 100%;
+    list-style: none;
 }
 
 .detail-columns li {
-    text-align: left;
+    text-align: left !important;
     list-style: none;
     position: relative;
     padding-left: 1.2rem;
     margin-bottom: 0.8rem;
+    width: 100%;
+    display: block;
 }
 
 .detail-columns li::before {
