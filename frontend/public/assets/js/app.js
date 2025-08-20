@@ -121,6 +121,8 @@
         
         // Send auto-reply confirmation to client
         const autoReplyParams = {
+            to_email: data.email,        // IMPORTANT: Destinataire du mail de confirmation
+            to_name: data.name,          // Nom du destinataire
             client_name: data.name,
             client_email: data.email,
             subject: data.subject,
