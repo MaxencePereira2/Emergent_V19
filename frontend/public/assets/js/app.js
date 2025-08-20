@@ -930,34 +930,319 @@
     });
 
     // Create mock projects if JSON fails to load
-    function createMockProjects() {
-        const mockProjects = [
-            {
-                slug: "optimisation-escalier-acier",
-                title: "Optimisation du temps de fabrication d'escalier en acier",
-                preview: "assets/projets/optimisation-escalier-acier/preview.jpg",
-                images: ["assets/projets/optimisation-escalier-acier/image1.jpg", "assets/projets/optimisation-escalier-acier/image2.jpg"],
-                summary: "Réduction du temps de fabrication d'escaliers métalliques par optimisation des procédés.",
-                key_points: ["Analyse des goulots d'étranglement", "Nouvelle méthode d'assemblage", "Outillage spécialisé"],
-                results: "Temps de fabrication réduit de 40%",
-                time_spent: "3 semaines",
-                tech: "Soudure MIG/MAG, usinage CNC"
-            },
-            {
-                slug: "ligne-production",
-                title: "Fabrication d'une ligne de production",
-                preview: "assets/projets/ligne-production/preview.jpg",
-                images: ["assets/projets/ligne-production/image1.jpg"],
-                summary: "Conception et réalisation complète d'une ligne de production automatisée.",
-                key_points: ["Automatisation des tâches répétitives", "Contrôle qualité intégré", "Interface opérateur intuitive"],
-                results: "Productivité augmentée de 60%",
-                time_spent: "8 semaines",
-                tech: "Automatisme, pneumatique, vision industrielle"
-            }
-        ];
-        
-        renderCarousel(mockProjects);
-        route(mockProjects);
-        window.addEventListener('hashchange', () => route(mockProjects));
+(function() {
+    // ... (autres code inchangés au-dessus)
+
+    // Projects and carousel functionality
+    // Remplacement du chargement dynamique par données statiques
+    const carouselHost = document.querySelector('#projets .track');
+    const prevBtn = document.querySelector('#projets .prev');
+    const nextBtn = document.querySelector('#projets .next');
+    const detail = document.getElementById('projet-detail');
+
+    function slugify(text) {
+        return text
+            .toLowerCase()
+            .replace(/[^\w\s-]/g, '')
+            .replace(/[-\s]+/g, '-')
+            .replace(/^-|-$/g, '');
     }
+
+    function cardHTML(p) {
+        return `
+            <article class="card">
+                <a href="#/projets/${p.slug}">
+                    <img src="${p.preview}" alt="${p.title}" onerror="this.style.display='none'"/>
+                    <h3>${p.title}</h3>
+                </a>
+            </article>
+        `;
+    }
+
+    function renderCarousel(items) {
+        if (!carouselHost) return;
+        // Trier les projets dans l'ordre 1–6 selon le numéro en début de titre
+        const sortedItems = items.sort((a, b) => {
+            const numA = parseInt(a.title.match(/^(\d+)/)?.[1] || '999');
+            const numB = parseInt(b.title.match(/^(\d+)/)?.[1] || '999');
+            return numA - numB;
+        });
+        // Dupliquer les items pour un défilement infini
+        const duplicatedItems = [...sortedItems, ...sortedItems];
+        carouselHost.innerHTML = duplicatedItems.map(cardHTML).join('');
+        // (Le reste de la fonction gère le scroll/drag, inchangé)
+        let isDragging = false;
+        let startX = 0;
+        let currentTranslate = 0;
+        let prevTranslate = 0;
+        let animationID = 0;
+        let startTime = 0;
+        function toggleAutoScroll(enable) {
+            if (enable) {
+                carouselHost.classList.add('auto-scroll');
+            } else {
+                carouselHost.classList.remove('auto-scroll');
+            }
+        }
+        setTimeout(() => {
+            if (!isDragging) {
+                toggleAutoScroll(true);
+            }
+        }, 2000);
+        carouselHost.addEventListener('mousedown', startDrag);
+        carouselHost.addEventListener('touchstart', startDrag, { passive: true });
+        document.addEventListener('mouseup', endDrag);
+        document.addEventListener('touchend', endDrag);
+        document.addEventListener('mousemove', drag);
+        document.addEventListener('touchmove', drag, { passive: true });
+        function startDrag(e) {
+            if (e.target.closest('.card a')) return;
+            isDragging = true;
+            startTime = Date.now();
+            toggleAutoScroll(false);
+            carouselHost.classList.add('dragging');
+            startX = getPositionX(e);
+            prevTranslate = currentTranslate;
+            animationID = requestAnimationFrame(animation);
+        }
+        function drag(e) {
+            if (!isDragging) return;
+            const currentPosition = getPositionX(e);
+            currentTranslate = prevTranslate + (currentPosition - startX) * 0.8;
+        }
+        function endDrag() {
+            if (!isDragging) return;
+            isDragging = false;
+            carouselHost.classList.remove('dragging');
+            cancelAnimationFrame(animationID);
+            const duration = Date.now() - startTime;
+            const distance = currentTranslate - prevTranslate;
+            const velocity = distance / duration;
+            if (Math.abs(velocity) > 0.1) {
+                currentTranslate += velocity * 200;
+            }
+            setTimeout(() => {
+                if (!isDragging) {
+                    toggleAutoScroll(true);
+                    currentTranslate = 0;
+                    prevTranslate = 0;
+                    carouselHost.style.transform = 'translateX(0)';
+                }
+            }, 3000);
+        }
+        function getPositionX(e) {
+            return e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+        }
+        function animation() {
+            if (isDragging) {
+                carouselHost.style.transform = `translateX(${currentTranslate}px)`;
+                requestAnimationFrame(animation);
+            }
+        }
+        carouselHost.addEventListener('mouseenter', () => {
+            if (!isDragging) {
+                carouselHost.style.animationPlayState = 'paused';
+            }
+        });
+        carouselHost.addEventListener('mouseleave', () => {
+            if (!isDragging) {
+                carouselHost.style.animationPlayState = 'running';
+            }
+        });
+    }
+
+    function renderDetail(p) {
+        if (!detail) return;
+        // (fonction inchangée qui génère le détail projet...)
+        detail.classList.remove('hidden', 'closing');
+        detail.setAttribute('aria-hidden', 'false');
+        const imageGallery = p.images && p.images.length > 0 
+            ? `<div class="gallery">${p.images.map(src => `<img src="${src}" alt="${p.title}" onerror="this.style.display='none'">`).join('')}</div>`
+            : '';
+        const keyPoints = p.key_points && p.key_points.length > 0
+            ? `<h3>Points clés</h3><ul class="bullets">${p.key_points.map(point => `<li>${point}</li>`).join('')}</ul>`
+            : '';
+        detail.innerHTML = `
+            <div class="project-detail-header">
+                <h2>${p.title}</h2>
+                <button class="close-project-btn" onclick="hideDetail()" title="Fermer le projet">…</button>
+            </div>
+            <p class="muted">${p.summary || ''}</p>
+            ${imageGallery}
+            <div class="cols">
+                <div>
+                    ${keyPoints}
+                    ${p.tech ? `<h3>Technologies</h3><p>${p.tech}</p>` : ''}
+                </div>
+                <div>
+                    <h3>Résultats</h3>
+                    <p>${p.results || ''}</p>
+                    ${p.time_spent ? `<p><em>Temps investi : ${p.time_spent}</em></p>` : ''}
+                </div>
+            </div>
+        `;
+    }
+
+    // ** Intégration statique des projets (6 éléments) **
+    const projects = [
+      {
+        "slug": "6-supression-des-jeux-mcanique-dans-robot-parrallle-3-axe",
+        "title": "6. Supression des jeux mécanique dans robot parrallèle 3 axe",
+        "preview": "assets/projets/6-supression-des-jeux-mcanique-dans-robot-parrallle-3-axe/2f.JPG",
+        "images": [
+          "assets/projets/6-supression-des-jeux-mcanique-dans-robot-parrallle-3-axe/2f.JPG",
+          "assets/projets/6-supression-des-jeux-mcanique-dans-robot-parrallle-3-axe/3f.JPG",
+          "assets/projets/6-supression-des-jeux-mcanique-dans-robot-parrallle-3-axe/4f.JPG"
+        ],
+        "summary": "Éliminer tout jeu de rotulage sur un robot parallèle 3D (3 DOF) afin d’augmenter rigidité, précision et accélérations, puis protéger l’invention (brevet).",
+        "key_points": [
+          "Contact double bille sur surfaces de référence avec différence de potentiel mécanique",
+          "Précharge élastique via tube/élément ressort assurant une contrainte permanente sur les doubles contacts",
+          "Fermeture cinématique isostatique tout en supprimant backlash et micro-basculements",
+          "Recherches d’antériorité & analyse de liberté résiduelle.",
+          "CAO + calculs de contact (Hertz) : contraintes locales, rigidité équivalente, distribution d’efforts.",
+          "Analyse modale/rigidité de la chaîne (comparatif avec rotules classiques).",
+          "Essais en boucle : maquettes instrumentées, mesures de répétabilité/retour.",
+          "Propriété intellectuelle : rédaction et dépôt de brevet (architecture, précharge, interfaces)."
+        ],
+        "results": "- 0 jeu mesuré réel\n- augmentation de l'accélération possible sans vibration (x5)\n- augmentation de la précision\n\nUtilité:\n\n- Impression 3D\n- Pick and place\n- ligne de production",
+        "time_spent": "N/A",
+        "tech": "Industrialisation, conception mécanique"
+      },
+      {
+        "slug": "3-dveloppement-dun-cadre-de-vtt-de-descente",
+        "title": "3. Développement d'un cadre de VTT de descente",
+        "preview": "assets/projets/3-dveloppement-dun-cadre-de-vtt-de-descente/1c.png",
+        "images": [
+          "assets/projets/3-dveloppement-dun-cadre-de-vtt-de-descente/1c.png",
+          "assets/projets/3-dveloppement-dun-cadre-de-vtt-de-descente/2c.png",
+          "assets/projets/3-dveloppement-dun-cadre-de-vtt-de-descente/3c.JPG",
+          "assets/projets/3-dveloppement-dun-cadre-de-vtt-de-descente/4c.JPG",
+          "assets/projets/3-dveloppement-dun-cadre-de-vtt-de-descente/5c.png",
+          "assets/projets/3-dveloppement-dun-cadre-de-vtt-de-descente/6c.png",
+          "assets/projets/3-dveloppement-dun-cadre-de-vtt-de-descente/7c.JPG"
+        ],
+        "summary": "Accompagnement d'une startup (october bike) pour son premier cadre de VTT de descente 100% made in France.\nCadre en acier CroMo (25CD4S)",
+        "key_points": [
+          "Itérations CAO -> recherche des ratios de compression amortisseur, optimisation de la fin de course, recherche de maintien milieu de course",
+          "Cost to design: choix des modes de cinématique en fonction des coûts de production",
+          "Rédaction des gammes de production, choix des solutions et procédés techniques.",
+          "Recherches de solutions low cost pour outillage \"one shot\"",
+          "Caractérisations mécaniques en CAO -> essais statiques et dynamiques, prévention des ZAT et optimisation des cordons de soudure",
+          "Mise en production: Gabarit, grugeage, chambrage, soudure TIG, usinage tour et fraiseuse conventionnel + CNC, reprise en usinage après soudure",
+          "Itérations rapides terrain / CAO / fabriation"
+        ],
+        "results": "- Cadre prêt à être commercialisé (2026)\n- Fabrication 100% française\n- Maitrise des procédés complets\n- Maitrise des coûts de production: concurrence le tarif des cadres taiwanais",
+        "time_spent": "CAO: 24 jours\nProduction: 31 jours\nAméliorations : 11 jours\n\nTotal: 66 jours + matière",
+        "tech": "Industrialisation, conception mécanique"
+      },
+      {
+        "slug": "2-fabrication-dune-ligne-de-production",
+        "title": "2. Fabrication d'une ligne de production",
+        "preview": "assets/projets/2-fabrication-dune-ligne-de-production/1b.jpg",
+        "images": [
+          "assets/projets/2-fabrication-dune-ligne-de-production/1b.jpg",
+          "assets/projets/2-fabrication-dune-ligne-de-production/2b.jpg",
+          "assets/projets/2-fabrication-dune-ligne-de-production/3b.jpg",
+          "assets/projets/2-fabrication-dune-ligne-de-production/4b.png",
+          "assets/projets/2-fabrication-dune-ligne-de-production/5b.png",
+          "assets/projets/2-fabrication-dune-ligne-de-production/6b.png"
+        ],
+        "summary": "Accompagnement d'une startup pour sa première ligne de production: presse statique de 40T + chariot interface spécifique + outillage spécifique.\nMachine \"low-tech\" -> pas d'autre énergie que l'énergie humaine, maintenance extrêmement simple, machine robuste.",
+        "key_points": [
+          "Rédigé le cahier des charge technique et fonctionnel aux côtés du client",
+          "proposé différentes solutions techniques chiffrées",
+          "CAO + essais numérique statique et dynamique",
+          "mise en production - découpe laser, usinage, ajustage, pliage",
+          "Soudure TIG + MAG",
+          "montage à blanc et essai en atelier",
+          "livraison",
+          "formation"
+        ],
+        "results": "Ligne de production en fonctionnement depuis fin 2024\npressage des produits jusqu'à 40T sans défaut\nCahier des charges et délais respectés\nPermet la création des premiers produits de la startup",
+        "time_spent": "Cahier des charges, solutions techniques: 10 jours\nCAO + essais numériques: 21 jours\nProduction: 17 jours\nLivraison / formation: 4 jours\n\nTotal: 52 jours + matière",
+        "tech": "Industrialisation, conception mécanique"
+      },
+      {
+        "slug": "4-conception-et-fabrication-dune-cintreuse-galets-manuelle",
+        "title": "4. Conception et fabrication d'une cintreuse à galets manuelle",
+        "preview": "assets/projets/4-conception-et-fabrication-dune-cintreuse-galets-manuelle/1d.jpeg",
+        "images": [
+          "assets/projets/4-conception-et-fabrication-dune-cintreuse-galets-manuelle/1d.jpeg",
+          "assets/projets/4-conception-et-fabrication-dune-cintreuse-galets-manuelle/2d.jpeg",
+          "assets/projets/4-conception-et-fabrication-dune-cintreuse-galets-manuelle/3d.jpeg"
+        ],
+        "summary": "Conception et fabrication d'un outillage de cintrage à froid pour l'acier (jusqu'à carré 16x16)",
+        "key_points": [
+          "CAO de l'ensemble -> cost to design",
+          "Mise en production (laser + tournage)",
+          "Essais",
+          "Livraison"
+        ],
+        "results": "- Cahier des charges respécté\n- coût maitrisé",
+        "time_spent": "CAO: 0,5 jours\nProduction: 0,5 jours\n\nTotal: 1 jour + matière",
+        "tech": "Industrialisation, conception mécanique"
+      },
+      {
+        "slug": "5-preuve-de-concept-impression-3d-metal-par-conduction",
+        "title": "5. Preuve de concept impression 3D metal par conduction",
+        "preview": "assets/projets/5-preuve-de-concept-impression-3d-metal-par-conduction/1e.JPG",
+        "images": [
+          "assets/projets/5-preuve-de-concept-impression-3d-metal-par-conduction/1e.JPG",
+          "assets/projets/5-preuve-de-concept-impression-3d-metal-par-conduction/2e.JPG",
+          "assets/projets/5-preuve-de-concept-impression-3d-metal-par-conduction/3e.jpg",
+          "assets/projets/5-preuve-de-concept-impression-3d-metal-par-conduction/4e.jpg",
+          "assets/projets/5-preuve-de-concept-impression-3d-metal-par-conduction/5e.jpg",
+          "assets/projets/5-preuve-de-concept-impression-3d-metal-par-conduction/coupe 2.JPG",
+          "assets/projets/5-preuve-de-concept-impression-3d-metal-par-conduction/coupe 4.JPG",
+          "assets/projets/5-preuve-de-concept-impression-3d-metal-par-conduction/coupe 6.JPG",
+          "assets/projets/5-preuve-de-concept-impression-3d-metal-par-conduction/coupe 7.JPG",
+          "assets/projets/5-preuve-de-concept-impression-3d-metal-par-conduction/coupe 8.JPG"
+        ],
+        "summary": "R&D impression 3D métal par conduction de chaleur : FDM métal\npreuve de concept pour levé de fonds",
+        "key_points": [
+          "Recherches d'antériorité - lecture de papiers",
+          "CAO / simulations logicielle",
+          "Calculs thermiques",
+          "mise en production par frittage laser sélectif en inconel",
+          "test / essais / erreurs / boucle",
+          "propriété intellectuelle - dépôt de brevet",
+          "Preuve de concept sur fusion d'acier par conduction et extrusion dans une buse de 0.4mm de diamètre"
+        ],
+        "results": "- P.O.C. validé\n- levée de fonds tour 1 validé",
+        "time_spent": "N/A",
+        "tech": "Industrialisation, conception mécanique"
+      },
+      {
+        "slug": "1-optimisation-du-temps-de-fabrication-descalier-en-acier",
+        "title": "1. Optimisation du temps de fabrication d'escalier en acier",
+        "preview": "assets/projets/1-optimisation-du-temps-de-fabrication-descalier-en-acier/1a.png",
+        "images": [
+          "assets/projets/1-optimisation-du-temps-de-fabrication-descalier-en-acier/1a.png",
+          "assets/projets/1-optimisation-du-temps-de-fabrication-descalier-en-acier/2a.png",
+          "assets/projets/1-optimisation-du-temps-de-fabrication-descalier-en-acier/3a.png",
+          "assets/projets/1-optimisation-du-temps-de-fabrication-descalier-en-acier/4a.png",
+          "assets/projets/1-optimisation-du-temps-de-fabrication-descalier-en-acier/5a.png"
+        ],
+        "summary": "j'ai accompagné un métallier qui réalise des escaliers en acier sur mesure de manière relativement artisanale.",
+        "key_points": [
+          "Standardisé le dessin des limons",
+          "Optimiser les chutes de découpe laser",
+          "Optimiser la conception pour le pliage CNC (prises de références)",
+          "Conçu un marbre de 2m * 4m pour la mise en position de toutes les pièces de l'escalier d'un coup",
+          "Revu les process de prise de côte et de production (soudure TIG + MIG)",
+          "Mise en place de procédures de soudure"
+        ],
+        "results": "Optimisation du temps de production de 120% -> passage de 20h de fabrication à 8h\nReduction du coût de production total de 61%\nDiminution de la masse de l'escalier de 32% -> pose simplifiée\nOptimisation de l'espace atelier par la standardisation des pièces\nReduction des erreurs (procédure)",
+        "time_spent": "12 jours répartis sur 3 mois: audit, CAO, discussions, accompagnement aux premières fabrications.",
+        "tech": "Industrialisation, conception mécanique"
+      }
+    ];
+
+    // Initialiser le carrousel avec les projets statiques
+    renderCarousel(projects);
+    route(projects);
+    window.addEventListener('hashchange', () => route(projects));
+
+    // ... (suite du code inchangé : gestion des routes #/projets/xxx, FAQ, etc.)
 })();
