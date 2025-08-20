@@ -1088,26 +1088,42 @@
       {
         "slug": "6-supression-des-jeux-mcanique-dans-robot-parrallle-3-axe",
         "title": "6. Supression des jeux mécanique dans robot parrallèle 3 axe",
-        "preview": "assets/projets/6-supression-des-jeux-mcanique-dans-robot-parrallle-3-axe/2f.JPG",
-        "images": [
-          "assets/projets/6-supression-des-jeux-mcanique-dans-robot-parrallle-3-axe/2f.JPG",
-          "assets/projets/6-supression-des-jeux-mcanique-dans-robot-parrallle-3-axe/3f.JPG",
-          "assets/projets/6-supression-des-jeux-mcanique-dans-robot-parrallle-3-axe/4f.JPG"
-        ],
-        "summary": "Éliminer tout jeu de rotulage sur un robot parallèle 3D (3 DOF) afin d’augmenter rigidité, précision et accélérations, puis protéger l’invention (brevet).",
-        "key_points": [
-          "Contact double bille sur surfaces de référence avec différence de potentiel mécanique",
-          "Précharge élastique via tube/élément ressort assurant une contrainte permanente sur les doubles contacts",
-          "Fermeture cinématique isostatique tout en supprimant backlash et micro-basculements",
-          "Recherches d’antériorité & analyse de liberté résiduelle.",
-          "CAO + calculs de contact (Hertz) : contraintes locales, rigidité équivalente, distribution d’efforts.",
-          "Analyse modale/rigidité de la chaîne (comparatif avec rotules classiques).",
-          "Essais en boucle : maquettes instrumentées, mesures de répétabilité/retour.",
-          "Propriété intellectuelle : rédaction et dépôt de brevet (architecture, précharge, interfaces)."
-        ],
-        "results": "- 0 jeu mesuré réel\n- augmentation de l'accélération possible sans vibration (x5)\n- augmentation de la précision\n\nUtilité:\n\n- Impression 3D\n- Pick and place\n- ligne de production",
-        "time_spent": "N/A",
-        "tech": "Industrialisation, conception mécanique"
+         "client_type": "R&D robotique / automatisation",
+      "summary": "Architecture de contact double bille préchargée élastiquement ; zéro backlash mesuré, rigidité et accélérations accrues.",
+      "context": "Éliminer les jeux de rotulage pour améliorer rigidité, précision et productivité ; protéger l’invention.",
+      "principle_expert": [
+        "Double contact bille sur surfaces de référence avec différentiel de potentiel mécanique",
+        "Précharge élastique par tube/élément ressort garantissant contrainte permanente",
+        "Fermeture cinématique isostatique sans backlash ni micro-basculement"
+      ],
+      "interventions": [
+        "Recherches d’antériorité et analyse de liberté résiduelle",
+        "CAO et calculs de contact (Hertz) : contraintes locales, rigidité équivalente",
+        "Analyse modale et rigidité de la chaîne cinématique",
+        "Maquettes instrumentées, mesures de répétabilité/retour en position",
+        "Rédaction et dépôt de brevet (architecture, précharge, interfaces)"
+      ],
+      "technologies": [
+        "Conception mécanique",
+        "Robotique parallèle",
+        "Calculs de contact",
+        "Essais instrumentés"
+      ],
+      "results": [
+        "Jeu mesuré : 0 (à la résolution du banc)",
+        "Accélérations exploitables ×5 sans vibration",
+        "Précision et répétabilité améliorées (impression 3D, pick-and-place, lignes de production)"
+      ],
+      "metrics": {
+        "measured_play_mm": 0,
+        "acceleration_factor": 5
+      },
+      "duration": {
+        "total_days": null,
+        "breakdown": []
+      },
+      "ip_status": "Brevet déposé",
+      "tags": ["robotique", "parallèle", "contact hertzien", "précharge", "brevet"]
       },
       {
         "slug": "3-dveloppement-dun-cadre-de-vtt-de-descente",
