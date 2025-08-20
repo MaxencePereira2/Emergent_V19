@@ -330,7 +330,7 @@ body::before {
     box-shadow: 0 10px 30px rgba(227, 220, 210, 0.3);
 }
 
-/* Section standard - Désactivation parallax sur mobile */
+/* Section standard - Aucun effet parallax */
 .section {
     max-width: 1200px;
     margin: 80px auto;
@@ -341,9 +341,10 @@ body::before {
     border-radius: 16px;
     border: 1px solid rgba(255, 255, 255, 0.2);
     
-    /* Parallax désactivé sur mobile par défaut */
-    transform: translateY(0);
-    opacity: 1;
+    /* Aucun effet - contraste constant */
+    transform: translateY(0) !important;
+    opacity: 1 !important;
+    transition: none !important;
 }
 
 /* Section tarifs - espacement corrigé avec FAQ */
@@ -356,22 +357,12 @@ body::before {
     margin-top: 6rem; /* Plus d'espace après tarifs */
 }
 
-/* Parallax uniquement sur desktop */
-@media (min-width: 769px) {
-    .section {
-        transition: transform 0.6s ease-out, opacity 0.6s ease-out;
-    }
-    
-    /* Seulement lors du scroll sur desktop */
-    .section.parallax-hidden {
-        transform: translateY(5%); /* Réduit drastiquement l'effet */
-        opacity: 0.7;
-    }
-    
-    .section.parallax-visible {
-        transform: translateY(0);
-        opacity: 1;
-    }
+/* Aucun effet parallax même sur desktop */
+.section.parallax-hidden,
+.section.parallax-visible {
+    transform: translateY(0) !important;
+    opacity: 1 !important;
+    transition: none !important;
 }
 
 /* Couleurs spécifiques pour chaque section - style Petralithe */
@@ -416,43 +407,24 @@ body::before {
     margin-right: auto;
 }
 
-/* Sous-sections de tarifs - Espace augmenté de 30% */
+/* Sous-sections de tarifs - Espace augmenté + cadres fins */
 .pricing-subsection {
-    margin-bottom: 5rem; /* Augmenté de 3rem à 5rem (+66%) */
+    margin-bottom: 5rem; /* Espace entre sections */
+    padding: 2rem;
+    border: 1px solid rgba(166, 115, 85, 0.2); /* Cadre fin autour de chaque section */
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.05); /* Fond très léger */
 }
 
 .pricing-subsection:last-child {
     margin-bottom: 0;
 }
 
-/* Couleurs distinctes pour les trois catégories */
-.pricing-subsection:nth-child(1) .subsection-title {
-    color: #2d5a87; /* Bleu profond pour Accompagnement */
-}
-
-.pricing-subsection:nth-child(1) .subsection-title::after {
-    background: linear-gradient(90deg, #2d5a87, #4a90a4);
-}
-
-.pricing-subsection:nth-child(2) .subsection-title {
-    color: #8b4513; /* Brun cuivré pour Machines */  
-}
-
-.pricing-subsection:nth-child(2) .subsection-title::after {
-    background: linear-gradient(90deg, #8b4513, #cd853f);
-}
-
-.pricing-subsection:nth-child(3) .subsection-title {
-    color: #2d5a4e; /* Vert foncé pour Consulting */
-}
-
-.pricing-subsection:nth-child(3) .subsection-title::after {
-    background: linear-gradient(90deg, #2d5a4e, #5a9367);
-}
-
+/* Couleur uniforme pour tous les titres de catégories */
 .subsection-title {
     font-size: 1.5rem;
     font-weight: 600;
+    color: var(--copper); /* Même couleur pour tous */
     text-align: center;
     margin: 0 0 2rem 0;
     text-transform: uppercase;
@@ -468,6 +440,7 @@ body::before {
     transform: translateX(-50%);
     width: 60px;
     height: 2px;
+    background: linear-gradient(90deg, var(--copper), var(--warm-beige)); /* Même ligne pour tous */
 }
 
 /* Grille des cartes tarifs - style premium */
@@ -623,12 +596,13 @@ body::before {
     padding: 2rem;
 }
 
-/* Colonnes détail - Fix alignement parfait */
+/* Colonnes détail - Alignement parfait pour toutes les cartes */
 .detail-columns {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 2.5rem;
     text-align: left;
+    align-items: start; /* Alignement au début pour éviter l'étirement */
 }
 
 .detail-left,
@@ -638,31 +612,41 @@ body::before {
     flex-direction: column;
     justify-content: flex-start;
     align-items: flex-start;
+    width: 100%;
 }
 
-/* Assure l'alignement parfait de la colonne droite */
-.detail-right {
-    text-align: left; /* Force l'alignement à gauche pour la colonne droite */
+/* Force l'alignement parfait de tous les éléments */
+.detail-left *,
+.detail-right * {
+    text-align: left !important;
+    justify-self: start;
+    align-self: start;
 }
 
 .detail-left h5,
 .detail-right h5 {
-    text-align: left; /* Titre aligné à gauche dans les deux colonnes */
+    text-align: left !important;
     margin-bottom: 1rem;
+    width: 100%;
+    display: block;
 }
 
 .detail-columns ul {
-    text-align: left;
+    text-align: left !important;
     margin: 0;
     padding-left: 0;
+    width: 100%;
+    list-style: none;
 }
 
 .detail-columns li {
-    text-align: left;
+    text-align: left !important;
     list-style: none;
     position: relative;
     padding-left: 1.2rem;
     margin-bottom: 0.8rem;
+    width: 100%;
+    display: block;
 }
 
 .detail-columns li::before {
@@ -841,6 +825,13 @@ body::before {
         display: none !important;
     }
     
+    /* Sections avec cadres adaptés pour mobile */
+    .pricing-subsection {
+        margin-bottom: 3rem;
+        padding: 1.5rem 1rem; /* Padding réduit sur mobile */
+        border: 1px solid rgba(166, 115, 85, 0.3); /* Border un peu plus visible sur mobile */
+    }
+    
     /* Pricing Section Mobile Improvements */
     #tarifs {
         padding: 2rem 1rem;
@@ -852,10 +843,6 @@ body::before {
         margin-bottom: 2.5rem;
         text-align: center;
         padding: 0 0.5rem;
-    }
-    
-    .pricing-subsection {
-        margin-bottom: 3rem;
     }
     
     .subsection-title {
@@ -928,25 +915,25 @@ body::before {
     .detail-columns {
         grid-template-columns: 1fr;
         gap: 2rem;
-        text-align: left; /* Fix text alignment issue */
+        text-align: left !important;
     }
     
     .detail-left h5,
     .detail-right h5 {
         font-size: 1rem;
         margin-bottom: 1rem;
-        text-align: left; /* Ensure consistent alignment */
+        text-align: left !important;
     }
     
     .detail-columns ul {
-        text-align: left; /* Fix text alignment issue */
+        text-align: left !important;
     }
     
     .detail-columns li {
         font-size: 0.95rem;
         line-height: 1.5;
         padding: 0.6rem 0;
-        text-align: left; /* Fix text alignment issue */
+        text-align: left !important;
     }
     
     .card-detail.open {
@@ -955,8 +942,10 @@ body::before {
         background: rgba(255, 255, 255, 0.3);
     }
     
-    /* Supprimer tous les effets parallax/fade sur mobile */
-    .section {
+    /* Supprimer TOUS les effets sur mobile */
+    .section,
+    .section.parallax-hidden,
+    .section.parallax-visible {
         transform: none !important;
         opacity: 1 !important;
         transition: none !important;
