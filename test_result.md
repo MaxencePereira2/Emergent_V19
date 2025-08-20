@@ -179,3 +179,5 @@ agent_communication:
     message: "Completed all three phases: 1) Workshop image re-integrated with 20% opacity, 2) Backend contact endpoint created with proper validation, 3) Site colors darkened 30%. Ready for backend testing of contact form functionality."
   - agent: "testing"
     message: "✅ BACKEND CONTACT FORM TESTING COMPLETE: All 6 backend API tests passed successfully. The POST /api/contact endpoint correctly handles validation, data storage, and error cases. GET /api/contact retrieves stored forms properly. Backend is fully functional and ready for frontend integration testing."
+  - agent: "main"
+    message: "✅ PRICING SUBSECTIONS INVESTIGATION COMPLETE: The reported issue of missing pricing sub-sections has been investigated. All 3 subsections ('Accompagnement et diagnostique', 'Machines et prototypes', 'Consulting') are present, visible, and working correctly in both HTML structure and visual rendering. Playwright testing confirms all subsection titles are visible in DOM. The pricing section displays perfectly with proper styling and functionality."
