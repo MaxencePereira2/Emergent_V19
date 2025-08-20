@@ -8,24 +8,16 @@
       "assets/projets/6-supression-des-jeux-mcanique-dans-robot-parrallle-3-axe/3f.JPG",
       "assets/projets/6-supression-des-jeux-mcanique-dans-robot-parrallle-3-axe/4f.JPG"
     ],
-    "summary": "Éliminer tout jeu de rotulage sur un robot parallèle 3D (3 DOF) afin d’augmenter rigidité, précision et accélérations, puis protéger l’invention (brevet).",
+    "summary": "R&D et dépôt de brevet : suppression de l'intégralité des jeux de rotulage dans les robots parallèles 3 axes.\nUtilisation d'un principe de mécanique simple: différence de point de potentiel au contact double billes + tube maintenu en position par une tension mécanique élastique.",
     "key_points": [
-      "Contact double bille sur surfaces de référence avec différence de potentiel mécanique",
-      "Précharge élastique via tube/élément ressort assurant une contrainte permanente sur les doubles contacts",
-      "Fermeture cinématique isostatique tout en supprimant backlash et micro-basculements",
-      "Recherches d’antériorité & analyse de liberté résiduelle.",
-      "CAO + calculs de contact (Hertz) : contraintes locales, rigidité équivalente, distribution d’efforts.",
-      "Analyse modale/rigidité de la chaîne (comparatif avec rotules classiques).",
-      "Essais en boucle : maquettes instrumentées, mesures de répétabilité/retour.",
-      "Propriété intellectuelle : rédaction et dépôt de brevet (architecture, précharge, interfaces).",
+      "Recherches d'antériorité - lecture de papiers",
+      "CAO / simulations logicielle",
+      "test / essais / erreurs / boucle",
+      "propriété intellectuelle - dépôt de brevet"
     ],
-    "results": [
-    "Jeu : 0 (dans la résolution du banc de mesure).",
-    "Accélérations exploitables ×5 sans entrée en vibration.",
-    "Précision et répétabilité significativement améliorées (applications : Impression 3D, pick-and-place, manipulation sur ligne)."
-    ],
+    "results": "- 0 jeu mesuré réel\n- augmentation de l'accélération possible sans vibration (x5)\n- augmentation de la précision\n\nUtilité:\n\n- Impression 3D\n- Pick and place\n- ligne de production",
     "time_spent": "N/A",
-    "tech": "Dossier de concept, modèles de calcul, maquettes d’essai, rapport de mesure, note de brevet."
+    "tech": "Industrialisation, conception mécanique"
   },
   {
     "slug": "3-dveloppement-dun-cadre-de-vtt-de-descente",
