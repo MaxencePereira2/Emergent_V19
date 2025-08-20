@@ -706,7 +706,19 @@
         detail.classList.add('hidden');
         detail.setAttribute('aria-hidden', 'true');
         detail.innerHTML = '';
+        
+        // Scroll back to projects section
+        const projectsSection = document.getElementById('projets');
+        if (projectsSection) {
+            window.scrollTo({
+                top: projectsSection.offsetTop - 100,
+                behavior: 'smooth'
+            });
+        }
     }
+    
+    // Make hideDetail global for onclick handlers
+    window.hideDetail = hideDetail;
 
     function route(items) {
         const hash = location.hash || '';
