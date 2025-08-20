@@ -18,6 +18,11 @@
         location.href = `mailto:${EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     });
 
+    // EmailJS initialization
+    (function(){
+        emailjs.init("kYuOmVqmEYAp7mfjU"); // Initialize with User ID
+    })();
+
     // Contact form handler with EmailJS integration
     const contactForm = document.getElementById('contact-form');
     const formStatus = document.querySelector('.form-status');
@@ -44,7 +49,10 @@
             
             try {
                 // Step 1: Save to database via backend
-                const backendUrl = 'https://alesium-landing.preview.emergentagent.com';
+                const backendUrl = window.location.origin.includes('localhost') ? 
+                    'http://localhost:8001' : 
+                    (window.REACT_APP_BACKEND_URL || 'https://alesium-landing.preview.emergentagent.com');
+                
                 const response = await fetch(`${backendUrl}/api/contact`, {
                     method: 'POST',
                     headers: {
@@ -57,8 +65,8 @@
                     throw new Error('Erreur lors de l\'enregistrement');
                 }
                 
-                // Step 2: Send emails via EmailJS (client-side)
-                await sendEmailViaEmailJS(data);
+                // Step 2: Send emails via EmailJS (client-side with SDK)
+                await sendEmailsViaEmailJS(data);
                 
                 // Success
                 formStatus.style.display = 'block';
@@ -80,79 +88,61 @@
         });
     }
 
-    // EmailJS integration function
-    async function sendEmailViaEmailJS(data) {
-        // EmailJS configuration
-        const emailJSConfig = {
-            serviceID: 'service_jc6o6xn',
-            notificationTemplateID: 'template_4ur9prj',
-            autoReplyTemplateID: 'template_tnqh3o9',
-            userID: 'kYuOmVqmEYAp7mfjU',
-            accessToken: 'kDN2xdpEqrTvCp2Ffwqa4'
-        };
-        
+    // EmailJS integration function using official SDK
+    async function sendEmailsViaEmailJS(data) {
         const timestamp = new Date().toLocaleString('fr-FR');
         
-        try {
-            // Send notification email to Alesium
-            const notificationParams = {
-                to_email: 'contact@alesium.fr',
-                to_name: 'Alesium',
-                from_name: data.name,
-                from_email: data.email,
-                subject: data.subject,
-                message: data.message,
-                phone: data.phone || 'Non renseigné',
-                timestamp: timestamp,
-                site_name: 'Alesium.fr'
-            };
-            
-            await sendSingleEmailJS(emailJSConfig.serviceID, emailJSConfig.notificationTemplateID, notificationParams, emailJSConfig.userID, emailJSConfig.accessToken);
-            console.log('✅ Notification email sent to Alesium');
-            
-            // Send auto-reply confirmation to client
-            const autoReplyParams = {
-                client_name: data.name,
-                client_email: data.email,
-                subject: data.subject,
-                message: data.message,
-                phone: data.phone || 'Non renseigné',
-                timestamp: timestamp
-            };
-            
-            await sendSingleEmailJS(emailJSConfig.serviceID, emailJSConfig.autoReplyTemplateID, autoReplyParams, emailJSConfig.userID, emailJSConfig.accessToken);
-            console.log('✅ Auto-reply confirmation sent to client');
-            
-        } catch (error) {
-            console.error('❌ EmailJS error:', error);
-            throw error;
-        }
-    }
-    
-    // Helper function to send single email via EmailJS
-    async function sendSingleEmailJS(serviceID, templateID, templateParams, userID, accessToken) {
-        const payload = {
-            service_id: serviceID,
-            template_id: templateID,
-            user_id: userID,
-            template_params: templateParams,
-            accessToken: accessToken
+        // Send notification email to Alesium
+        const notificationParams = {
+            to_email: 'contact@alesium.fr',
+            to_name: 'Alesium',
+            from_name: data.name,
+            from_email: data.email,
+            subject: data.subject,
+            message: data.message,
+            phone: data.phone || 'Non renseigné',
+            timestamp: timestamp,
+            site_name: 'Alesium.fr'
         };
         
-        const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(payload)
-        });
-        
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`EmailJS API error: ${response.status} - ${errorText}`);
+        try {
+            console.log('📧 Sending notification email to Alesium...');
+            await emailjs.send(
+                'service_jc6o6xn',           // Service ID
+                'template_4ur9prj',          // Notification template ID
+                notificationParams,          // Template parameters
+                'kYuOmVqmEYAp7mfjU'         // User ID
+            );
+            console.log('✅ Notification email sent to Alesium');
+        } catch (error) {
+            console.error('❌ Error sending notification email:', error);
+            throw error;
         }
         
-        return response.text();
+        // Send auto-reply confirmation to client
+        const autoReplyParams = {
+            client_name: data.name,
+            client_email: data.email,
+            subject: data.subject,
+            message: data.message,
+            phone: data.phone || 'Non renseigné',
+            timestamp: timestamp
+        };
+        
+        try {
+            console.log('📧 Sending confirmation email to client...');
+            await emailjs.send(
+                'service_jc6o6xn',           // Service ID  
+                'template_tnqh3o9',          // Auto-reply template ID
+                autoReplyParams,             // Template parameters
+                'kYuOmVqmEYAp7mfjU'         // User ID
+            );
+            console.log('✅ Confirmation email sent to client');
+        } catch (error) {
+            console.error('❌ Error sending confirmation email:', error);
+            // Don't throw error for auto-reply failure - notification is more important
+            console.warn('⚠️ Continuing despite auto-reply failure');
+        }
     }
 
     // Lightbox functionality for project images
