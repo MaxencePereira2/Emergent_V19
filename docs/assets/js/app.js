@@ -1084,181 +1084,549 @@
     }
 
     // ** Intégration statique des projets (6 éléments) **
-    const projects = [
-      {
-        "slug": "6-supression-des-jeux-mcanique-dans-robot-parrallle-3-axe",
-        "title": "6. Supression des jeux mécanique dans robot parrallèle 3 axe",
-         "client_type": "R&D robotique / automatisation",
-      "summary": "Architecture de contact double bille préchargée élastiquement ; zéro backlash mesuré, rigidité et accélérations accrues.",
-      "context": "Éliminer les jeux de rotulage pour améliorer rigidité, précision et productivité ; protéger l’invention.",
-      "principle_expert": [
+(function() {
+    // ... (autres code inchangés au-dessus)
+
+    // Projects and carousel functionality
+    // Remplacement du chargement dynamique par données statiques
+    const carouselHost = document.querySelector('#projets .track');
+    const prevBtn = document.querySelector('#projets .prev');
+    const nextBtn = document.querySelector('#projets .next');
+    const detail = document.getElementById('projet-detail');
+
+    function slugify(text) {
+        return text
+            .toLowerCase()
+            .replace(/[^\w\s-]/g, '')
+            .replace(/[-\s]+/g, '-')
+            .replace(/^-|-$/g, '');
+    }
+
+    function cardHTML(p) {
+        return `
+            <article class="card">
+                <a href="#/projets/${p.slug}">
+                    <img src="${p.preview}" alt="${p.title}" onerror="this.style.display='none'"/>
+                    <h3>${p.title}</h3>
+                </a>
+            </article>
+        `;
+    }
+
+    function renderCarousel(items) {
+        if (!carouselHost) return;
+        // Trier les projets dans l'ordre 1–6 selon le numéro en début de titre
+        const sortedItems = items.sort((a, b) => {
+            const numA = parseInt(a.title.match(/^(\d+)/)?.[1] || '999');
+            const numB = parseInt(b.title.match(/^(\d+)/)?.[1] || '999');
+            return numA - numB;
+        });
+        // Dupliquer les items pour un défilement infini
+        const duplicatedItems = [...sortedItems, ...sortedItems];
+        carouselHost.innerHTML = duplicatedItems.map(cardHTML).join('');
+        // (Le reste de la fonction gère le scroll/drag, inchangé)
+        let isDragging = false;
+        let startX = 0;
+        let currentTranslate = 0;
+        let prevTranslate = 0;
+        let animationID = 0;
+        let startTime = 0;
+        function toggleAutoScroll(enable) {
+            if (enable) {
+                carouselHost.classList.add('auto-scroll');
+            } else {
+                carouselHost.classList.remove('auto-scroll');
+            }
+        }
+        setTimeout(() => {
+            if (!isDragging) {
+                toggleAutoScroll(true);
+            }
+        }, 2000);
+        carouselHost.addEventListener('mousedown', startDrag);
+        carouselHost.addEventListener('touchstart', startDrag, { passive: true });
+        document.addEventListener('mouseup', endDrag);
+        document.addEventListener('touchend', endDrag);
+        document.addEventListener('mousemove', drag);
+        document.addEventListener('touchmove', drag, { passive: true });
+        function startDrag(e) {
+            if (e.target.closest('.card a')) return;
+            isDragging = true;
+            startTime = Date.now();
+            toggleAutoScroll(false);
+            carouselHost.classList.add('dragging');
+            startX = getPositionX(e);
+            prevTranslate = currentTranslate;
+            animationID = requestAnimationFrame(animation);
+        }
+        function drag(e) {
+            if (!isDragging) return;
+            const currentPosition = getPositionX(e);
+            currentTranslate = prevTranslate + (currentPosition - startX) * 0.8;
+        }
+        function endDrag() {
+            if (!isDragging) return;
+            isDragging = false;
+            carouselHost.classList.remove('dragging');
+            cancelAnimationFrame(animationID);
+            const duration = Date.now() - startTime;
+            const distance = currentTranslate - prevTranslate;
+            const velocity = distance / duration;
+            if (Math.abs(velocity) > 0.1) {
+                currentTranslate += velocity * 200;
+            }
+            setTimeout(() => {
+                if (!isDragging) {
+                    toggleAutoScroll(true);
+                    currentTranslate = 0;
+                    prevTranslate = 0;
+                    carouselHost.style.transform = 'translateX(0)';
+                }
+            }, 3000);
+        }
+        function getPositionX(e) {
+            return e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+        }
+        function animation() {
+            if (isDragging) {
+                carouselHost.style.transform = `translateX(${currentTranslate}px)`;
+                requestAnimationFrame(animation);
+            }
+        }
+        carouselHost.addEventListener('mouseenter', () => {
+            if (!isDragging) {
+                carouselHost.style.animationPlayState = 'paused';
+            }
+        });
+        carouselHost.addEventListener('mouseleave', () => {
+            if (!isDragging) {
+                carouselHost.style.animationPlayState = 'running';
+            }
+        });
+    }
+
+    function renderDetail(p) {
+        if (!detail) return;
+        // (fonction inchangée qui génère le détail projet...)
+        detail.classList.remove('hidden', 'closing');
+        detail.setAttribute('aria-hidden', 'false');
+        const imageGallery = p.images && p.images.length > 0 
+            ? `<div class="gallery">${p.images.map(src => `<img src="${src}" alt="${p.title}" onerror="this.style.display='none'">`).join('')}</div>`
+            : '';
+        const keyPoints = p.key_points && p.key_points.length > 0
+            ? `<h3>Points clés</h3><ul class="bullets">${p.key_points.map(point => `<li>${point}</li>`).join('')}</ul>`
+            : '';
+        detail.innerHTML = `
+            <div class="project-detail-header">
+                <h2>${p.title}</h2>
+                <button class="close-project-btn" onclick="hideDetail()" title="Fermer le projet">…</button>
+            </div>
+            <p class="muted">${p.summary || ''}</p>
+            ${imageGallery}
+            <div class="cols">
+                <div>
+                    ${keyPoints}
+                    ${p.tech ? `<h3>Technologies</h3><p>${p.tech}</p>` : ''}
+                </div>
+                <div>
+                    <h3>Résultats</h3>
+                    <p>${p.results || ''}</p>
+                    ${p.time_spent ? `<p><em>Temps investi : ${p.time_spent}</em></p>` : ''}
+                </div>
+            </div>
+        `;
+    }
+    /* ========= PROJETS — Données (texte mis à jour 2025-08-20) + mapping compat ========= */
+
+// 1) Données brutes (celles que tu m’as fournies)
+//    Remarque : on n’utilise ici QUE du texte. Les chemins d’images sont gérés juste en-dessous.
+const RAW_DATA = {
+  version: "2025-08-20",
+  projects: [
+    {
+      id: 1,
+      slug: "optimisation-fabrication-escaliers-acier",
+      title: "Optimisation du temps de fabrication d’escaliers en acier",
+      client_type: "Atelier de métallerie (sur-mesure)",
+      summary: "Industrialisation d’un atelier d’escaliers acier sans perte de qualité : standardisation, outillage, procédures et flux.",
+      context: "Fabrication artisanale d’escaliers sur-mesure ; besoin d’augmenter le débit et de fiabiliser la production.",
+      interventions: [
+        "Standardisation du dossier technique (gabarits CAO des limons, repères de perçage)",
+        "Optimisation des imbrications de découpe laser pour réduire les chutes",
+        "Conception orientée pliage CNC (prises de référence, tolérances, séquences)",
+        "Conception d’un marbre 2 × 4 m pour mise en position en une seule prise",
+        "Revue des modes opératoires et rédaction de procédures de soudage TIG/MIG"
+      ],
+      technologies: ["Industrialisation", "Conception mécanique", "DFMA", "Soudage TIG/MIG", "Outillage d’assemblage"],
+      results: [
+        "Temps de fabrication réduit de 20 h à 8 h (−60 %, x2,5 de débit)",
+        "Coût de production total −61 %",
+        "Masse −32 % (manutention et pose simplifiées)",
+        "Réduction des non-conformités et des reprises",
+        "Flux atelier fluidifiés par la standardisation"
+      ],
+      metrics: { hours_before: 20, hours_after: 8, time_reduction_percent: 60, cost_reduction_percent: 61, mass_reduction_percent: 32 },
+      duration: { total_days: 12, spread: "3 mois", breakdown: ["Audit", "CAO & outillage", "Pilote atelier", "Accompagnement premières séries"] },
+      tags: ["escalier", "acier", "industrialisation", "atelier", "soudage", "DFMA"]
+    },
+    {
+      id: 2,
+      slug: "ligne-production-low-tech-presse-40t",
+      title: "Conception & mise en service d’une première ligne de production low-tech",
+      client_type: "Startup (industrialisation initiale)",
+      summary: "Presse statique 40 t + chariot d’interface et outillages dédiés ; architecture low-tech robuste, maintenance simple.",
+      context: "Démarrage industriel sans énergie motorisée : priorité à la robustesse, la sécurité et la disponibilité.",
+      interventions: [
+        "Co-rédaction du cahier des charges fonctionnel et technique",
+        "Études de variantes chiffrées (TCO, risques, délais)",
+        "CAO + calculs statiques/dynamiques",
+        "Découpe laser, usinage, pliage, ajustage",
+        "Soudage TIG/MAG, montage à blanc, essais, formation",
+        "Livraison et documentation d’exploitation"
+      ],
+      technologies: ["Conception mécanique", "DFMA", "AMDEC", "Ergonomie & sécurité machine"],
+      results: [
+        "Ligne opérationnelle depuis fin 2024",
+        "Pressage jusqu’à 40 t conforme aux spécifications",
+        "Cahier des charges et délais tenus",
+        "Lancement des premières productions"
+      ],
+      metrics: { press_force_tonnes: 40, commissioning_date: "2024-12-01" },
+      duration: {
+        total_days: 52,
+        breakdown: ["Cahier des charges & variantes : 10 j", "CAO & calculs : 21 j", "Fabrication : 17 j", "Mise en service & formation : 4 j"]
+      },
+      tags: ["ligne de production", "presse", "low-tech", "sécurité", "mise en service"]
+    },
+    {
+      id: 3,
+      slug: "cadre-vtt-descente-acier-25cd4s",
+      title: "Développement d’un cadre de VTT de descente (DH) – acier 25CD4S",
+      client_type: "Startup cycles (October Bike)",
+      summary: "Cinématique optimisée, DFMA et gammes de fabrication ; gabarits, reprises après soudure et qualification procédés.",
+      context: "Premier cadre DH conçu et fabriqué en France ; contrainte coût/industrialisation élevée.",
+      interventions: [
+        "Itérations CAO cinématique (ratios de compression, fin de course, maintien en milieu de course)",
+        "Cost-to-design : choix de cinématique vs coûts d’outillage/fabrication",
+        "Rédaction des gammes et choix procédés (grugeage, chambrage, TIG)",
+        "Outillage one-shot low-cost pour prototypage",
+        "Calculs mécaniques (statique & pseudo-dynamique), prévention ZAT, optimisation cordons",
+        "Mise en production : gabarits, usinage tour/fraiseuse (conv. + CNC), reprises après soudure",
+        "Boucles rapides terrain ↔ CAO ↔ fabrication"
+      ],
+      technologies: ["Conception mécano-soudée", "Prototypage rapide", "Qualification soudure", "DFMEA"],
+      materials: ["Acier 25CD4S (Cr-Mo)"],
+      deliverables: ["Dossiers CAO/plan", "Gabarits de soudage", "Gammes & nomenclatures", "Recommandations procédés & contrôle"],
+      tags: ["VTT", "cadre", "cinématique", "mécano-soudé", "prototypage", "DFMA"]
+    },
+    {
+      id: 4,
+      slug: "cintreuse-galets-manuelle-16mm",
+      title: "Conception & fabrication d’une cintreuse à galets manuelle",
+      client_type: "Atelier fabrication / outillage",
+      summary: "Outillage de cintrage à froid économique et robuste, jusqu’au carré 16 × 16.",
+      context: "Besoin d’un outillage simple, fiable et peu coûteux pour cintrage à froid de profils acier.",
+      interventions: [
+        "CAO orientée cost-to-design (standardisation, tolérances réalistes)",
+        "Mise en fabrication : découpe laser + tournage des galets/axes",
+        "Essais et ajustements (géométrie, effort opérateur)",
+        "Livraison avec fiche d’utilisation/maintenance"
+      ],
+      technologies: ["Conception mécanique", "Outillage", "Fabrication unitaire"],
+      results: ["Cahier des charges respecté", "Coût maîtrisé", "Cintrage à froid jusqu’au carré 16 × 16"],
+      metrics: { max_section_mm: [16, 16], process: "cintrage à froid" },
+      duration: { total_days: 1, breakdown: ["CAO : 0,5 j", "Fabrication : 0,5 j"] },
+      tags: ["outillage", "cintrage", "galets", "cost-to-design"]
+    },
+    {
+      id: 5,
+      slug: "poc-impression-3d-metal-conduction-fdm",
+      title: "Preuve de concept — Impression 3D métal par conduction (type FDM)",
+      client_type: "R&D / levée de fonds",
+      summary: "Extrusion métallique par conduction thermique ; validation expérimentale avec buse Ø 0,4 mm et cadrage IP.",
+      context: "Démontrer la faisabilité d’une extrusion métal par conduction pour sécuriser un tour de financement.",
+      approach_expert: [
+        "Revue bibliographique, antériorités et cartographie IP",
+        "Modélisation thermique transitoire (bilans énergétiques, pertes convection/rayonnement)",
+        "Définition de fenêtres procédé (T° buse/fil, effort d’extrusion, vitesse/pas vs Ø 0,4 mm)",
+        "Analyse tribologique et contraintes internes (adhésion couche à couche, retrait)",
+        "Banc d’essai instrumenté et itérations rapides test/erreur",
+        "Prototypage fonctionnel via SLS Inconel pour pièces exposées",
+        "Rédaction et dépôt de brevet (principe, fenêtres procédé, géométrie d’extrusion)"
+      ],
+      technologies: ["Industrialisation", "Conception mécanique", "Thermique", "Procédés additifs"],
+      results: [
+        "POC validé : fusion/expulsion d’acier à travers buse Ø 0,4 mm avec cordon continu",
+        "Levée de fonds (tour 1) validée sur base technique + positionnement IP"
+      ],
+      metrics: { nozzle_diameter_mm: 0.4, material: "Acier (tests), outillages SLS Inconel" },
+      duration: { total_days: null, breakdown: [] },
+      ip_status: "Brevet déposé",
+      tags: ["impression 3D métal", "conduction", "R&D", "brevet", "POC"]
+    },
+    {
+      id: 6,
+      slug: "robot-parallele-3-axes-suppression-jeux",
+      title: "R&D robot parallèle 3 axes — suppression intégrale des jeux",
+      client_type: "R&D robotique / automatisation",
+      summary: "Architecture de contact double bille préchargée élastiquement ; zéro backlash mesuré, rigidité et accélérations accrues.",
+      context: "Éliminer les jeux de rotulage pour améliorer rigidité, précision et productivité ; protéger l’invention.",
+      principle_expert: [
         "Double contact bille sur surfaces de référence avec différentiel de potentiel mécanique",
         "Précharge élastique par tube/élément ressort garantissant contrainte permanente",
         "Fermeture cinématique isostatique sans backlash ni micro-basculement"
       ],
-      "interventions": [
+      interventions: [
         "Recherches d’antériorité et analyse de liberté résiduelle",
         "CAO et calculs de contact (Hertz) : contraintes locales, rigidité équivalente",
         "Analyse modale et rigidité de la chaîne cinématique",
         "Maquettes instrumentées, mesures de répétabilité/retour en position",
         "Rédaction et dépôt de brevet (architecture, précharge, interfaces)"
       ],
-      "technologies": [
-        "Conception mécanique",
-        "Robotique parallèle",
-        "Calculs de contact",
-        "Essais instrumentés"
-      ],
-      "results": [
+      technologies: ["Conception mécanique", "Robotique parallèle", "Calculs de contact", "Essais instrumentés"],
+      results: [
         "Jeu mesuré : 0 (à la résolution du banc)",
         "Accélérations exploitables ×5 sans vibration",
         "Précision et répétabilité améliorées (impression 3D, pick-and-place, lignes de production)"
       ],
-      "metrics": {
-        "measured_play_mm": 0,
-        "acceleration_factor": 5
-      },
-      "duration": {
-        "total_days": null,
-        "breakdown": []
-      },
-      "ip_status": "Brevet déposé",
-      "tags": ["robotique", "parallèle", "contact hertzien", "précharge", "brevet"]
-      },
-      {
-        "slug": "3-dveloppement-dun-cadre-de-vtt-de-descente",
-        "title": "3. Développement d'un cadre de VTT de descente",
-        "preview": "assets/projets/3-dveloppement-dun-cadre-de-vtt-de-descente/1c.png",
-        "images": [
-          "assets/projets/3-dveloppement-dun-cadre-de-vtt-de-descente/1c.png",
-          "assets/projets/3-dveloppement-dun-cadre-de-vtt-de-descente/2c.png",
-          "assets/projets/3-dveloppement-dun-cadre-de-vtt-de-descente/3c.JPG",
-          "assets/projets/3-dveloppement-dun-cadre-de-vtt-de-descente/4c.JPG",
-          "assets/projets/3-dveloppement-dun-cadre-de-vtt-de-descente/5c.png",
-          "assets/projets/3-dveloppement-dun-cadre-de-vtt-de-descente/6c.png",
-          "assets/projets/3-dveloppement-dun-cadre-de-vtt-de-descente/7c.JPG"
-        ],
-        "summary": "Accompagnement d'une startup (october bike) pour son premier cadre de VTT de descente 100% made in France.\nCadre en acier CroMo (25CD4S)",
-        "key_points": [
-          "Itérations CAO -> recherche des ratios de compression amortisseur, optimisation de la fin de course, recherche de maintien milieu de course",
-          "Cost to design: choix des modes de cinématique en fonction des coûts de production",
-          "Rédaction des gammes de production, choix des solutions et procédés techniques.",
-          "Recherches de solutions low cost pour outillage \"one shot\"",
-          "Caractérisations mécaniques en CAO -> essais statiques et dynamiques, prévention des ZAT et optimisation des cordons de soudure",
-          "Mise en production: Gabarit, grugeage, chambrage, soudure TIG, usinage tour et fraiseuse conventionnel + CNC, reprise en usinage après soudure",
-          "Itérations rapides terrain / CAO / fabriation"
-        ],
-        "results": "- Cadre prêt à être commercialisé (2026)\n- Fabrication 100% française\n- Maitrise des procédés complets\n- Maitrise des coûts de production: concurrence le tarif des cadres taiwanais",
-        "time_spent": "CAO: 24 jours\nProduction: 31 jours\nAméliorations : 11 jours\n\nTotal: 66 jours + matière",
-        "tech": "Industrialisation, conception mécanique"
-      },
-      {
-        "slug": "2-fabrication-dune-ligne-de-production",
-        "title": "2. Fabrication d'une ligne de production",
-        "preview": "assets/projets/2-fabrication-dune-ligne-de-production/1b.jpg",
-        "images": [
-          "assets/projets/2-fabrication-dune-ligne-de-production/1b.jpg",
-          "assets/projets/2-fabrication-dune-ligne-de-production/2b.jpg",
-          "assets/projets/2-fabrication-dune-ligne-de-production/3b.jpg",
-          "assets/projets/2-fabrication-dune-ligne-de-production/4b.png",
-          "assets/projets/2-fabrication-dune-ligne-de-production/5b.png",
-          "assets/projets/2-fabrication-dune-ligne-de-production/6b.png"
-        ],
-        "summary": "Accompagnement d'une startup pour sa première ligne de production: presse statique de 40T + chariot interface spécifique + outillage spécifique.\nMachine \"low-tech\" -> pas d'autre énergie que l'énergie humaine, maintenance extrêmement simple, machine robuste.",
-        "key_points": [
-          "Rédigé le cahier des charge technique et fonctionnel aux côtés du client",
-          "proposé différentes solutions techniques chiffrées",
-          "CAO + essais numérique statique et dynamique",
-          "mise en production - découpe laser, usinage, ajustage, pliage",
-          "Soudure TIG + MAG",
-          "montage à blanc et essai en atelier",
-          "livraison",
-          "formation"
-        ],
-        "results": "Ligne de production en fonctionnement depuis fin 2024\npressage des produits jusqu'à 40T sans défaut\nCahier des charges et délais respectés\nPermet la création des premiers produits de la startup",
-        "time_spent": "Cahier des charges, solutions techniques: 10 jours\nCAO + essais numériques: 21 jours\nProduction: 17 jours\nLivraison / formation: 4 jours\n\nTotal: 52 jours + matière",
-        "tech": "Industrialisation, conception mécanique"
-      },
-      {
-        "slug": "4-conception-et-fabrication-dune-cintreuse-galets-manuelle",
-        "title": "4. Conception et fabrication d'une cintreuse à galets manuelle",
-        "preview": "assets/projets/4-conception-et-fabrication-dune-cintreuse-galets-manuelle/1d.jpeg",
-        "images": [
-          "assets/projets/4-conception-et-fabrication-dune-cintreuse-galets-manuelle/1d.jpeg",
-          "assets/projets/4-conception-et-fabrication-dune-cintreuse-galets-manuelle/2d.jpeg",
-          "assets/projets/4-conception-et-fabrication-dune-cintreuse-galets-manuelle/3d.jpeg"
-        ],
-        "summary": "Conception et fabrication d'un outillage de cintrage à froid pour l'acier (jusqu'à carré 16x16)",
-        "key_points": [
-          "CAO de l'ensemble -> cost to design",
-          "Mise en production (laser + tournage)",
-          "Essais",
-          "Livraison"
-        ],
-        "results": "- Cahier des charges respécté\n- coût maitrisé",
-        "time_spent": "CAO: 0,5 jours\nProduction: 0,5 jours\n\nTotal: 1 jour + matière",
-        "tech": "Industrialisation, conception mécanique"
-      },
-      {
-        "slug": "5-preuve-de-concept-impression-3d-metal-par-conduction",
-        "title": "5. Preuve de concept impression 3D metal par conduction",
-        "preview": "assets/projets/5-preuve-de-concept-impression-3d-metal-par-conduction/1e.JPG",
-        "images": [
-          "assets/projets/5-preuve-de-concept-impression-3d-metal-par-conduction/1e.JPG",
-          "assets/projets/5-preuve-de-concept-impression-3d-metal-par-conduction/2e.JPG",
-          "assets/projets/5-preuve-de-concept-impression-3d-metal-par-conduction/3e.jpg",
-          "assets/projets/5-preuve-de-concept-impression-3d-metal-par-conduction/4e.jpg",
-          "assets/projets/5-preuve-de-concept-impression-3d-metal-par-conduction/5e.jpg",
-          "assets/projets/5-preuve-de-concept-impression-3d-metal-par-conduction/coupe 2.JPG",
-          "assets/projets/5-preuve-de-concept-impression-3d-metal-par-conduction/coupe 4.JPG",
-          "assets/projets/5-preuve-de-concept-impression-3d-metal-par-conduction/coupe 6.JPG",
-          "assets/projets/5-preuve-de-concept-impression-3d-metal-par-conduction/coupe 7.JPG",
-          "assets/projets/5-preuve-de-concept-impression-3d-metal-par-conduction/coupe 8.JPG"
-        ],
-        "summary": "R&D impression 3D métal par conduction de chaleur : FDM métal\npreuve de concept pour levé de fonds",
-        "key_points": [
-          "Recherches d'antériorité - lecture de papiers",
-          "CAO / simulations logicielle",
-          "Calculs thermiques",
-          "mise en production par frittage laser sélectif en inconel",
-          "test / essais / erreurs / boucle",
-          "propriété intellectuelle - dépôt de brevet",
-          "Preuve de concept sur fusion d'acier par conduction et extrusion dans une buse de 0.4mm de diamètre"
-        ],
-        "results": "- P.O.C. validé\n- levée de fonds tour 1 validé",
-        "time_spent": "N/A",
-        "tech": "Industrialisation, conception mécanique"
-      },
-      {
-        "slug": "1-optimisation-du-temps-de-fabrication-descalier-en-acier",
-        "title": "1. Optimisation du temps de fabrication d'escalier en acier",
-        "preview": "assets/projets/1-optimisation-du-temps-de-fabrication-descalier-en-acier/1a.png",
-        "images": [
-          "assets/projets/1-optimisation-du-temps-de-fabrication-descalier-en-acier/1a.png",
-          "assets/projets/1-optimisation-du-temps-de-fabrication-descalier-en-acier/2a.png",
-          "assets/projets/1-optimisation-du-temps-de-fabrication-descalier-en-acier/3a.png",
-          "assets/projets/1-optimisation-du-temps-de-fabrication-descalier-en-acier/4a.png",
-          "assets/projets/1-optimisation-du-temps-de-fabrication-descalier-en-acier/5a.png"
-        ],
-        "summary": "j'ai accompagné un métallier qui réalise des escaliers en acier sur mesure de manière relativement artisanale.",
-        "key_points": [
-          "Standardisé le dessin des limons",
-          "Optimiser les chutes de découpe laser",
-          "Optimiser la conception pour le pliage CNC (prises de références)",
-          "Conçu un marbre de 2m * 4m pour la mise en position de toutes les pièces de l'escalier d'un coup",
-          "Revu les process de prise de côte et de production (soudure TIG + MIG)",
-          "Mise en place de procédures de soudure"
-        ],
-        "results": "Optimisation du temps de production de 120% -> passage de 20h de fabrication à 8h\nReduction du coût de production total de 61%\nDiminution de la masse de l'escalier de 32% -> pose simplifiée\nOptimisation de l'espace atelier par la standardisation des pièces\nReduction des erreurs (procédure)",
-        "time_spent": "12 jours répartis sur 3 mois: audit, CAO, discussions, accompagnement aux premières fabrications.",
-        "tech": "Industrialisation, conception mécanique"
-      }
-    ];
+      metrics: { measured_play_mm: 0, acceleration_factor: 5 },
+      duration: { total_days: null, breakdown: [] },
+      ip_status: "Brevet déposé",
+      tags: ["robotique", "parallèle", "contact hertzien", "précharge", "brevet"]
+    }
+  ]
+};
 
-    // Initialiser le carrousel avec les projets statiques
-    renderCarousel(projects);
-    route(projects);
-    window.addEventListener('hashchange', () => route(projects));
+// 2) Réutilisation des mêmes IMAGES que précédemment (aucun changement de fichiers)
+const previewById = {
+  1: "assets/projets/1-optimisation-du-temps-de-fabrication-descalier-en-acier/1a.png",
+  2: "assets/projets/2-fabrication-dune-ligne-de-production/1b.jpg",
+  3: "assets/projets/3-dveloppement-dun-cadre-de-vtt-de-descente/1c.png",
+  4: "assets/projets/4-conception-et-fabrication-dune-cintreuse-galets-manuelle/1d.jpeg",
+  5: "assets/projets/5-preuve-de-concept-impression-3d-metal-par-conduction/1e.JPG",
+  6: "assets/projets/6-supression-des-jeux-mcanique-dans-robot-parrallle-3-axe/2f.JPG"
+};
 
-    // ... (suite du code inchangé : gestion des routes #/projets/xxx, FAQ, etc.)
+const imagesById = {
+  1: [
+    "assets/projets/1-optimisation-du-temps-de-fabrication-descalier-en-acier/1a.png",
+    "assets/projets/1-optimisation-du-temps-de-fabrication-descalier-en-acier/2a.png",
+    "assets/projets/1-optimisation-du-temps-de-fabrication-descalier-en-acier/3a.png",
+    "assets/projets/1-optimisation-du-temps-de-fabrication-descalier-en-acier/4a.png",
+    "assets/projets/1-optimisation-du-temps-de-fabrication-descalier-en-acier/5a.png"
+  ],
+  2: [
+    "assets/projets/2-fabrication-dune-ligne-de-production/1b.jpg",
+    "assets/projets/2-fabrication-dune-ligne-de-production/2b.jpg",
+    "assets/projets/2-fabrication-dune-ligne-de-production/3b.jpg",
+    "assets/projets/2-fabrication-dune-ligne-de-production/4b.png",
+    "assets/projets/2-fabrication-dune-ligne-de-production/5b.png",
+    "assets/projets/2-fabrication-dune-ligne-de-production/6b.png"
+  ],
+  3: [
+    "assets/projets/3-dveloppement-dun-cadre-de-vtt-de-descente/1c.png",
+    "assets/projets/3-dveloppement-dun-cadre-de-vtt-de-descente/2c.png",
+    "assets/projets/3-dveloppement-dun-cadre-de-vtt-de-descente/3c.JPG",
+    "assets/projets/3-dveloppement-dun-cadre-de-vtt-de-descente/4c.JPG",
+    "assets/projets/3-dveloppement-dun-cadre-de-vtt-de-descente/5c.png",
+    "assets/projets/3-dveloppement-dun-cadre-de-vtt-de-descente/6c.png",
+    "assets/projets/3-dveloppement-dun-cadre-de-vtt-de-descente/7c.JPG"
+  ],
+  4: [
+    "assets/projets/4-conception-et-fabrication-dune-cintreuse-galets-manuelle/1d.jpeg",
+    "assets/projets/4-conception-et-fabrication-dune-cintreuse-galets-manuelle/2d.jpeg",
+    "assets/projets/4-conception-et-fabrication-dune-cintreuse-galets-manuelle/3d.jpeg"
+  ],
+  5: [
+    "assets/projets/5-preuve-de-concept-impression-3d-metal-par-conduction/1e.JPG",
+    "assets/projets/5-preuve-de-concept-impression-3d-metal-par-conduction/2e.JPG",
+    "assets/projets/5-preuve-de-concept-impression-3d-metal-par-conduction/3e.jpg",
+    "assets/projets/5-preuve-de-concept-impression-3d-metal-par-conduction/4e.jpg",
+    "assets/projets/5-preuve-de-concept-impression-3d-metal-par-conduction/5e.jpg",
+    "assets/projets/5-preuve-de-concept-impression-3d-metal-par-conduction/coupe 2.JPG",
+    "assets/projets/5-preuve-de-concept-impression-3d-metal-par-conduction/coupe 4.JPG",
+    "assets/projets/5-preuve-de-concept-impression-3d-metal-par-conduction/coupe 6.JPG",
+    "assets/projets/5-preuve-de-concept-impression-3d-metal-par-conduction/coupe 7.JPG",
+    "assets/projets/5-preuve-de-concept-impression-3d-metal-par-conduction/coupe 8.JPG"
+  ],
+  6: [
+    "assets/projets/6-supression-des-jeux-mcanique-dans-robot-parrallle-3-axe/2f.JPG",
+    "assets/projets/6-supression-des-jeux-mcanique-dans-robot-parrallle-3-axe/3f.JPG",
+    "assets/projets/6-supression-des-jeux-mcanique-dans-robot-parrallle-3-axe/4f.JPG"
+  ]
+};
+
+// 3) Normalisation : on regroupe les champs pour rester 100% compatible avec le rendu existant
+function normalizeProjects(raw) {
+  return raw.projects.map((p) => {
+    const preview = previewById[p.id] || "";
+    const images = imagesById[p.id] || [];
+    // On agrège summary + context pour un résumé plus riche (comme tu le souhaites)
+    const mergedSummary = [p.summary, p.context].filter(Boolean).join(" ");
+    // On choisit une liste prioritaire : interventions > approach_expert > principle_expert
+    const bulletList = p.interventions || p.approach_expert || p.principle_expert || [];
+    // Les résultats peuvent être un tableau : on les rend lisibles d’un bloc
+    const mergedResults = Array.isArray(p.results) ? p.results.join(" ; ") : (p.results || "");
+    // Technologies : tableau → chaîne lisible
+    const mergedTech = Array.isArray(p.technologies) ? p.technologies.join(", ") : (p.tech || "");
+
+    return {
+      // Champs UI essentiels
+      slug: p.slug,
+      title: p.title,
+      preview,
+      images,
+      summary: mergedSummary,
+      key_points: bulletList,
+      results: mergedResults,
+      tech: mergedTech,
+      // Champs additionnels utiles (affichés plus bas si dispo)
+      client_type: p.client_type || null,
+      tags: p.tags || [],
+      metrics: p.metrics || null,
+      duration: p.duration || null,
+      materials: p.materials || null,
+      deliverables: p.deliverables || null,
+      ip_status: p.ip_status || null
+    };
+  });
+}
+
+const projects = normalizeProjects(RAW_DATA);
+
+/* ========= CARDS / CARROUSEL (identique en fonctionnement) ========= */
+
+function cardHTML(p) {
+  return `
+    <article class="card">
+      <a href="#/projets/${p.slug}">
+        <img src="${p.preview}" alt="${p.title}" onerror="this.style.display='none'"/>
+        <h3>${p.title}</h3>
+      </a>
+    </article>
+  `;
+}
+
+(function initCarouselAndRouting() {
+  const carouselHost = document.querySelector('#projets .track');
+  const detail = document.getElementById('projet-detail');
+
+  function renderCarousel(items) {
+    if (!carouselHost) return;
+    // tri léger si des titres commencent par un numéro, sinon l’ordre reste tel quel
+    const sorted = items.slice().sort((a, b) => {
+      const A = parseInt((a.title || "").match(/^(\d+)/)?.[1] || "999", 10);
+      const B = parseInt((b.title || "").match(/^(\d+)/)?.[1] || "999", 10);
+      return A - B;
+    });
+    const duplicated = [...sorted, ...sorted];
+    carouselHost.innerHTML = duplicated.map(cardHTML).join("");
+
+    // petite logique de drag (inchangée)
+    let isDragging = false, startX = 0, currentTranslate = 0, prevTranslate = 0, animationID = 0, startTime = 0;
+    function toggleAutoScroll(enable){ carouselHost?.classList[enable?"add":"remove"]("auto-scroll"); }
+    setTimeout(()=>{ if(!isDragging) toggleAutoScroll(true); }, 2000);
+
+    function getPositionX(e){ return e.type.includes("mouse") ? e.clientX : e.touches[0].clientX; }
+    function animation(){ if(isDragging){ carouselHost.style.transform = `translateX(${currentTranslate}px)`; requestAnimationFrame(animation); } }
+    function startDrag(e){ if(e.target.closest(".card a")) return; isDragging=true; startTime=Date.now(); toggleAutoScroll(false); carouselHost.classList.add("dragging"); startX=getPositionX(e); prevTranslate=currentTranslate; animationID=requestAnimationFrame(animation); }
+    function drag(e){ if(!isDragging) return; const cur=getPositionX(e); currentTranslate = prevTranslate + (cur - startX) * 0.8; }
+    function endDrag(){ if(!isDragging) return; isDragging=false; carouselHost.classList.remove("dragging"); cancelAnimationFrame(animationID);
+      const duration=Date.now()-startTime, distance=currentTranslate-prevTranslate, velocity=distance/duration;
+      if(Math.abs(velocity)>0.1){ currentTranslate += velocity*200; }
+      setTimeout(()=>{ if(!isDragging){ toggleAutoScroll(true); currentTranslate=0; prevTranslate=0; carouselHost.style.transform='translateX(0)'; } }, 3000);
+    }
+
+    carouselHost.addEventListener('mousedown', startDrag);
+    carouselHost.addEventListener('touchstart', startDrag, { passive: true });
+    document.addEventListener('mouseup', endDrag);
+    document.addEventListener('touchend', endDrag);
+    document.addEventListener('mousemove', drag);
+    document.addEventListener('touchmove', drag, { passive: true });
+
+    carouselHost.addEventListener('mouseenter', ()=>{ if(!isDragging) carouselHost.style.animationPlayState='paused'; });
+    carouselHost.addEventListener('mouseleave', ()=>{ if(!isDragging) carouselHost.style.animationPlayState='running'; });
+  }
+
+  function renderDetail(p) {
+    if (!detail) return;
+    const imageGallery = (p.images && p.images.length)
+      ? `<div class="gallery">${p.images.map(src => `<img src="${src}" alt="${p.title}" onerror="this.style.display='none'">`).join('')}</div>`
+      : '';
+
+    // priorise p.key_points déjà normalisé ; fallback si jamais vide
+    const bullets = (p.key_points && p.key_points.length) ? p.key_points
+                  : (p.interventions || p.approach_expert || p.principle_expert || []);
+
+    const keyPoints = (bullets && bullets.length)
+      ? `<h3>Points clés</h3><ul class="bullets">${bullets.map(point => `<li>${point}</li>`).join('')}</ul>`
+      : '';
+
+    const tags = (p.tags && p.tags.length)
+      ? `<div class="tags">${p.tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>`
+      : '';
+
+    const metrics = p.metrics ? `<div class="metrics">
+        <h3>Métriques</h3>
+        <ul class="bullets">${Object.entries(p.metrics).map(([k,v]) => `<li><strong>${k} :</strong> ${Array.isArray(v)?v.join(' × '):v}</li>`).join('')}</ul>
+      </div>` : '';
+
+    const duration = p.duration ? `<div class="duration">
+        <h3>Durée</h3>
+        <p><em>${p.duration.total_days ?? "N/A"} jours</em>${p.duration.spread ? " — " + p.duration.spread : ""}</p>
+        ${(p.duration.breakdown && p.duration.breakdown.length) ? `<ul class="bullets">${p.duration.breakdown.map(x=>`<li>${x}</li>`).join('')}</ul>` : ""}
+      </div>` : '';
+
+    const tech = p.tech ? `<h3>Technologies</h3><p>${p.tech}</p>` : '';
+
+    const extra = `
+      ${p.client_type ? `<p class="muted"><strong>Client :</strong> ${p.client_type}</p>` : ""}
+      ${p.materials && p.materials.length ? `<p class="muted"><strong>Matériaux :</strong> ${p.materials.join(", ")}</p>` : ""}
+      ${p.deliverables && p.deliverables.length ? `<p class="muted"><strong>Livrables :</strong> ${p.deliverables.join(", ")}</p>` : ""}
+      ${p.ip_status ? `<p class="muted"><strong>PI :</strong> ${p.ip_status}</p>` : ""}
+    `;
+
+    detail.classList.remove('hidden', 'closing');
+    detail.setAttribute('aria-hidden', 'false');
+    detail.innerHTML = `
+      <div class="project-detail-header">
+        <h2>${p.title}</h2>
+        <button class="close-project-btn" onclick="hideDetail()" title="Fermer le projet">×</button>
+      </div>
+      <p class="muted">${p.summary || ""}</p>
+      ${extra}
+      ${imageGallery}
+      <div class="cols">
+        <div>
+          ${keyPoints}
+          ${tech}
+          ${tags}
+        </div>
+        <div>
+          ${p.results ? `<h3>Résultats</h3><p>${p.results}</p>` : ""}
+          ${metrics}
+          ${duration}
+        </div>
+      </div>
+    `;
+  }
+
+  // router minimal (doit déjà exister dans ton fichier ; garde un seul routeur actif)
+  function route(items) {
+    const hash = (location.hash || "").replace(/^#/, "");
+    const match = hash.match(/^\/projets\/(.+)/);
+    if (!match) {
+      if (detail) { detail.classList.add('hidden'); detail.setAttribute('aria-hidden','true'); }
+      return;
+    }
+    const slug = match[1];
+    const p = items.find(x => x.slug === slug);
+    if (p) renderDetail(p);
+  }
+
+  // initialisation
+  renderCarousel(projects);
+  route(projects);
+  window.addEventListener('hashchange', () => route(projects));
 })();
+
