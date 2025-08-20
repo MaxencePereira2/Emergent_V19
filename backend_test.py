@@ -257,6 +257,80 @@ class ContactFormTester:
             self.log_test("Error handling (malformed JSON)", False, f"Request error: {str(e)}")
             return False
     
+    def test_emailjs_integration(self):
+        """Test EmailJS integration with specific review request data"""
+        print("\n--- Testing EmailJS Integration ---")
+        
+        # Use the exact data from the review request
+        emailjs_test_data = {
+            "name": "Test EmailJS Integration",
+            "email": "test.emailjs@example.com",
+            "phone": "06 12 34 56 78",
+            "subject": "audit",
+            "message": "Test message to verify EmailJS dual email functionality: notification to Alesium + auto-reply confirmation to client."
+        }
+        
+        try:
+            print(f"Sending EmailJS test request to: {self.base_url}/contact")
+            print(f"Test data: {json.dumps(emailjs_test_data, indent=2)}")
+            
+            response = requests.post(
+                f"{self.base_url}/contact",
+                json=emailjs_test_data,
+                headers={"Content-Type": "application/json"},
+                timeout=30  # Longer timeout for email processing
+            )
+            
+            print(f"Response status: {response.status_code}")
+            print(f"Response headers: {dict(response.headers)}")
+            
+            if response.status_code == 200:
+                data = response.json()
+                print(f"Response data: {json.dumps(data, indent=2)}")
+                
+                # Verify response structure
+                required_fields = ["id", "name", "email", "subject", "message", "timestamp"]
+                missing_fields = [field for field in required_fields if field not in data]
+                
+                if not missing_fields:
+                    self.created_contacts.append(data["id"])
+                    
+                    # Verify the data matches what we sent
+                    data_matches = (
+                        data["name"] == emailjs_test_data["name"] and
+                        data["email"] == emailjs_test_data["email"] and
+                        data["phone"] == emailjs_test_data["phone"] and
+                        data["subject"] == emailjs_test_data["subject"] and
+                        data["message"] == emailjs_test_data["message"]
+                    )
+                    
+                    if data_matches:
+                        self.log_test("EmailJS Integration - Data Storage", True, 
+                                    f"Contact stored successfully with ID: {data['id']}")
+                        
+                        # Note: EmailJS email sending happens in background task
+                        # We can't directly verify email delivery in this test
+                        # But we can verify the API accepts the request and stores data
+                        self.log_test("EmailJS Integration - API Response", True, 
+                                    "API successfully processed EmailJS contact form submission")
+                        return True
+                    else:
+                        self.log_test("EmailJS Integration - Data Validation", False, 
+                                    "Stored data doesn't match submitted data")
+                        return False
+                else:
+                    self.log_test("EmailJS Integration - Response Structure", False, 
+                                f"Missing fields in response: {missing_fields}")
+                    return False
+            else:
+                self.log_test("EmailJS Integration - API Call", False, 
+                            f"Status: {response.status_code}, Response: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log_test("EmailJS Integration - Request Error", False, f"Request error: {str(e)}")
+            return False
+    
     def run_all_tests(self):
         """Run all contact form tests"""
         print("=" * 60)
