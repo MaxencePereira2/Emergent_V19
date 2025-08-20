@@ -100,20 +100,33 @@ async def create_contact_form(input: ContactFormCreate, background_tasks: Backgr
         raise HTTPException(status_code=500, detail="Error processing contact form")
 
 async def send_contact_email_async(name: str, email: str, subject: str, message: str, phone: Optional[str] = None):
-    """Background task to send contact email via EmailJS"""
+    """Background task to send both notification and auto-reply emails via EmailJS"""
     try:
-        result = await emailjs_service.send_contact_email(
+        result = await emailjs_service.send_contact_emails(
             name=name,
             email=email, 
             subject=subject,
             message=message,
             phone=phone
         )
-        logger.info(f"📧 Email sent successfully: {result}")
+        
+        if result['overall_success']:
+            logger.info(f"📧✅ Emails processed for {name} ({email})")
+            if result['notification_sent']:
+                logger.info("   → ✅ Notification email sent to Alesium")
+            if result['auto_reply_sent']:
+                logger.info("   → ✅ Confirmation email sent to client")
+            
+            if result['errors']:
+                for error in result['errors']:
+                    logger.warning(f"   → ⚠️ {error}")
+        else:
+            logger.error(f"📧❌ Failed to send emails for {name}: {result['errors']}")
+            
     except EmailJSError as e:
-        logger.error(f"📧 EmailJS error: {str(e)}")
+        logger.error(f"📧❌ EmailJS error for {name}: {str(e)}")
     except Exception as e:
-        logger.error(f"📧 Unexpected email error: {str(e)}")
+        logger.error(f"📧❌ Unexpected email error for {name}: {str(e)}")
 
 @api_router.get("/contact", response_model=List[ContactForm])
 async def get_contact_forms():
