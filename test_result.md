@@ -125,7 +125,19 @@ backend:
         comment: "✅ BACKEND TESTS PASSED: All 6 contact form API tests successful. POST /api/contact correctly validates required fields (name, email, subject, message), handles optional phone field, validates email format, stores data in MongoDB, and GET /api/contact retrieves stored forms. Error handling works properly with 422 status codes for invalid data."
 
 frontend:
-  - task: "Workshop image re-integration in hero section"
+  - task: "Pricing subsections visibility investigation"
+    implemented: true
+    working: true
+    file: "/app/frontend/public/index.html"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "✅ INVESTIGATION COMPLETE: All 3 pricing subsections ('Accompagnement et diagnostique', 'Machines et prototypes', 'Consulting') are present, visible, and working correctly. Playwright testing confirmed all subsection titles are visible in DOM. Issue was already resolved by previous engineer."
+
+  - task: "Desktop text alignment fix in Diagnostic Flash"
     implemented: true
     working: true
     file: "/app/frontend/public/assets/css/app.css"
@@ -135,7 +147,19 @@ frontend:
     status_history:
       - working: true
         agent: "main"
-        comment: "Successfully re-implemented workshop image with 20% opacity using ::before pseudo-element. Image shows correctly in hero section."
+        comment: "✅ TEXT ALIGNMENT FIXED: Added explicit left-alignment CSS rules for .detail-columns, .detail-left, and .detail-right to ensure consistent text alignment across all pricing cards. Desktop text alignment is now uniform."
+
+  - task: "Mobile responsive design improvements"
+    implemented: true
+    working: true
+    file: "/app/frontend/public/assets/css/app.css"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "✅ MOBILE RESPONSIVE DRAMATICALLY IMPROVED: Complete overhaul of mobile CSS including enhanced navigation, hero section, pricing cards, typography, spacing, and layout. Mobile design is now professional and user-friendly while preserving perfect desktop experience."
 
   - task: "Contact form frontend integration"
     implemented: true
@@ -148,6 +172,18 @@ frontend:
       - working: false
         agent: "main"
         comment: "Updated form to remove action/method attributes and added JavaScript handler to POST to /api/contact endpoint. Need to test form submission."
+
+  - task: "Workshop image re-integration in hero section"
+    implemented: true
+    working: true
+    file: "/app/frontend/public/assets/css/app.css"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Successfully re-implemented workshop image with 20% opacity using ::before pseudo-element. Image shows correctly in hero section."
 
   - task: "Color palette darkening"
     implemented: true
