@@ -133,15 +133,16 @@
         
         try {
             console.log('📧 Sending confirmation email to client...');
-            await emailjs.send(
+            const result = await emailjs.send(
                 'service_jc6o6xn',           // Service ID  
                 'template_tnqh3o9',          // Auto-reply template ID
                 autoReplyParams,             // Template parameters
                 'kYuOmVqmEYAp7mfjU'         // User ID
             );
-            console.log('✅ Confirmation email sent to client');
+            console.log('✅ Confirmation email sent to client successfully:', result);
         } catch (error) {
             console.error('❌ Error sending confirmation email:', error);
+            console.error('Auto-reply params:', autoReplyParams);
             // Don't throw error for auto-reply failure - notification is more important
             console.warn('⚠️ Continuing despite auto-reply failure');
         }
