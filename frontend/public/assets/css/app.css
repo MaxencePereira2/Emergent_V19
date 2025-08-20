@@ -690,45 +690,48 @@ body::before {
     padding: 2rem;
 }
 
-/* Colonnes détail - Alignement parfait pour toutes les cartes */
+/* Colonnes détail - Alignement parfait des deux colonnes */
 .detail-columns {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 2.5rem;
     text-align: left;
-    align-items: start; /* Alignement au début pour éviter l'étirement */
+    align-items: start;
 }
 
 .detail-left,
 .detail-right {
-    text-align: left;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
     align-items: flex-start;
     width: 100%;
+    text-align: left;
 }
 
-/* Force l'alignement parfait de tous les éléments */
+/* Force l'alignement parfait de TOUS les éléments */
 .detail-left *,
 .detail-right * {
     text-align: left !important;
-    justify-self: start;
-    align-self: start;
+    margin-left: 0 !important;
+    padding-left: 0 !important;
 }
 
 .detail-left h5,
 .detail-right h5 {
     text-align: left !important;
-    margin-bottom: 1rem;
+    margin: 0 0 1rem 0 !important;
+    padding: 0 !important;
     width: 100%;
     display: block;
+    font-weight: 600;
+    color: var(--copper);
 }
 
 .detail-columns ul {
     text-align: left !important;
-    margin: 0;
-    padding-left: 0;
+    margin: 0 !important;
+    padding: 0 !important;
     width: 100%;
     list-style: none;
 }
@@ -738,16 +741,25 @@ body::before {
     list-style: none;
     position: relative;
     padding-left: 1.2rem;
-    margin-bottom: 0.8rem;
+    margin: 0 0 0.8rem 0 !important;
     width: 100%;
     display: block;
+    line-height: 1.5;
 }
 
 .detail-columns li::before {
     content: '→';
     position: absolute;
     left: 0;
+    top: 0;
     color: var(--copper);
+    font-weight: bold;
+}
+
+/* Spécifique pour les coches dans la colonne droite */
+.detail-right li::before {
+    content: '✓';
+    color: #28a745;
     font-weight: bold;
 }
 
