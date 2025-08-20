@@ -746,7 +746,7 @@ body::before {
     text-align: left !important;
     list-style: none;
     position: relative;
-    padding-left: 2rem; /* Augmenté de 1.2rem à 2rem pour plus d'espace */
+    padding-left: 3rem; /* Augmenté significativement pour plus d'espace */
     margin: 0 0 0.8rem 0 !important;
     width: 100%;
     display: block;
@@ -756,11 +756,13 @@ body::before {
 .detail-columns li::before {
     content: '→';
     position: absolute;
-    left: 0.5rem; /* Décalé vers la droite pour éviter le bord */
+    left: 0.8rem; /* Plus de marge du bord */
     top: 0;
     color: var(--copper);
     font-weight: bold;
-    width: 1rem; /* Largeur fixe pour la puce */
+    width: 1.5rem; /* Plus de largeur pour la puce */
+    text-align: center; /* Centre la puce dans son espace */
+    font-size: 1.1em; /* Légèrement plus grande pour plus de visibilité */
 }
 
 /* Spécifique pour les coches dans la colonne droite avec plus d'espace */
@@ -768,8 +770,10 @@ body::before {
     content: '✓';
     color: #28a745;
     font-weight: bold;
-    left: 0.5rem; /* Même position que les flèches */
-    width: 1rem;
+    left: 0.8rem;
+    width: 1.5rem;
+    text-align: center;
+    font-size: 1.1em;
 }
 
 .detail-left h5,
