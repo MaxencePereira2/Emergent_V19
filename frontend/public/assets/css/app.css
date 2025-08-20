@@ -1044,9 +1044,15 @@ body::before {
     .detail-columns li {
         font-size: 0.95rem;
         line-height: 1.5;
-        padding-left: 1.2rem;
+        padding-left: 2rem; /* Même espacement sur mobile */
         margin: 0 0 0.6rem 0 !important;
         text-align: left !important;
+    }
+    
+    /* Puces mobiles avec bon espacement */
+    .detail-columns li::before {
+        left: 0.5rem; /* Même position que desktop */
+        width: 1rem;
     }
     
     .card-detail.open {
