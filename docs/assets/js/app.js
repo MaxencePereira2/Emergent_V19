@@ -651,7 +651,9 @@
 
     function renderDetail(p) {
         if (!detail) return;
-        detail.classList.remove('hidden');
+        
+        // Supprimer les classes d'animation précédentes
+        detail.classList.remove('hidden', 'closing');
         detail.setAttribute('aria-hidden', 'false');
         
         const imageGallery = p.images && p.images.length > 0 
@@ -695,22 +697,30 @@
         // Add gallery listeners after rendering
         setTimeout(addGalleryListeners, 100);
         
-        // Smooth scroll to detail section
+        // Animation d'ouverture fluide
+        detail.classList.add('opening');
+        
+        // Scroll vers le détail avec animation
         setTimeout(() => {
             window.scrollTo({
                 top: detail.offsetTop - 100,
                 behavior: 'smooth'
             });
         }, 100);
+        
+        // Nettoyer la classe d'animation après l'animation
+        setTimeout(() => {
+            detail.classList.remove('opening');
+        }, 500);
     }
 
     function hideDetail() {
         if (!detail) return;
-        detail.classList.add('hidden');
-        detail.setAttribute('aria-hidden', 'true');
-        detail.innerHTML = '';
         
-        // Scroll back to projects section
+        // Animation de fermeture fluide
+        detail.classList.add('closing');
+        
+        // Scroll vers la section projets pendant la fermeture
         const projectsSection = document.getElementById('projets');
         if (projectsSection) {
             window.scrollTo({
@@ -718,6 +728,14 @@
                 behavior: 'smooth'
             });
         }
+        
+        // Attendre la fin de l'animation avant de cacher complètement
+        setTimeout(() => {
+            detail.classList.add('hidden');
+            detail.classList.remove('closing');
+            detail.setAttribute('aria-hidden', 'true');
+            detail.innerHTML = '';
+        }, 400); // Durée de l'animation de fermeture
     }
     
     // Make hideDetail global for onclick handlers
