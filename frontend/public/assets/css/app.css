@@ -581,11 +581,17 @@ body::before {
     padding: 2rem;
 }
 
-/* Colonnes détail */
+/* Colonnes détail - Fix text alignment */
 .detail-columns {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 2.5rem;
+    text-align: left; /* Ensure left alignment */
+}
+
+.detail-left,
+.detail-right {
+    text-align: left; /* Force left alignment for all content */
 }
 
 .detail-left h5,
