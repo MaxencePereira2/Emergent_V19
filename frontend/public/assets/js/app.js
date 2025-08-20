@@ -43,9 +43,8 @@
             submitBtn.disabled = true;
             
             try {
-                // Get backend URL from React environment or fallback
-                const backendUrl = process.env.REACT_APP_BACKEND_URL || 
-                                 window.location.origin.replace(':3000', ':8001');
+                // Use the correct backend URL for the environment
+                const backendUrl = 'https://alesium-landing.preview.emergentagent.com';
                 
                 const response = await fetch(`${backendUrl}/api/contact`, {
                     method: 'POST',
