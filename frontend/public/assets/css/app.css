@@ -604,17 +604,54 @@ body::before {
     padding: 2rem;
 }
 
-/* Colonnes détail - Fix text alignment */
+/* Colonnes détail - Fix alignement parfait */
 .detail-columns {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 2.5rem;
-    text-align: left; /* Ensure left alignment */
+    text-align: left;
 }
 
 .detail-left,
 .detail-right {
-    text-align: left; /* Force left alignment for all content */
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+}
+
+/* Assure l'alignement parfait de la colonne droite */
+.detail-right {
+    text-align: left; /* Force l'alignement à gauche pour la colonne droite */
+}
+
+.detail-left h5,
+.detail-right h5 {
+    text-align: left; /* Titre aligné à gauche dans les deux colonnes */
+    margin-bottom: 1rem;
+}
+
+.detail-columns ul {
+    text-align: left;
+    margin: 0;
+    padding-left: 0;
+}
+
+.detail-columns li {
+    text-align: left;
+    list-style: none;
+    position: relative;
+    padding-left: 1.2rem;
+    margin-bottom: 0.8rem;
+}
+
+.detail-columns li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: var(--copper);
+    font-weight: bold;
 }
 
 .detail-left h5,
