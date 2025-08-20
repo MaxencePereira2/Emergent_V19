@@ -742,25 +742,31 @@ body::before {
     margin-bottom: 1.5rem !important;
 }
 
+/* Alternative : si les ::before posent encore problème, utiliser flexbox */
 .detail-columns li {
     text-align: left !important;
     list-style: none;
     position: relative;
-    padding-left: 2rem; /* Augmenté de 1.2rem à 2rem pour plus d'espace */
+    padding-left: 3rem; /* Augmenté significativement pour plus d'espace */
     margin: 0 0 0.8rem 0 !important;
     width: 100%;
-    display: block;
+    display: flex;
+    align-items: flex-start;
     line-height: 1.5;
+    min-height: 1.5em;
 }
 
 .detail-columns li::before {
     content: '→';
     position: absolute;
-    left: 0.5rem; /* Décalé vers la droite pour éviter le bord */
+    left: 0.8rem; /* Plus de marge du bord */
     top: 0;
     color: var(--copper);
     font-weight: bold;
-    width: 1rem; /* Largeur fixe pour la puce */
+    width: 1.5rem; /* Plus de largeur pour la puce */
+    text-align: left; /* Aligné à gauche dans son espace */
+    font-size: 1.1em; /* Légèrement plus grande pour plus de visibilité */
+    flex-shrink: 0; /* Ne se réduit pas */
 }
 
 /* Spécifique pour les coches dans la colonne droite avec plus d'espace */
@@ -768,8 +774,18 @@ body::before {
     content: '✓';
     color: #28a745;
     font-weight: bold;
-    left: 0.5rem; /* Même position que les flèches */
-    width: 1rem;
+    left: 0.8rem;
+    width: 1.5rem;
+    text-align: left;
+    font-size: 1.1em;
+    flex-shrink: 0;
+}
+
+/* Assurer que le texte ne déborde pas */
+.detail-columns li span,
+.detail-columns li div {
+    flex: 1;
+    word-wrap: break-word;
 }
 
 .detail-left h5,
@@ -1050,15 +1066,17 @@ body::before {
     .detail-columns li {
         font-size: 0.95rem;
         line-height: 1.5;
-        padding-left: 2rem; /* Même espacement sur mobile */
+        padding-left: 3rem; /* Même espacement généreux sur mobile */
         margin: 0 0 0.6rem 0 !important;
         text-align: left !important;
     }
     
-    /* Puces mobiles avec bon espacement */
+    /* Puces mobiles avec espacement généreux */
     .detail-columns li::before {
-        left: 0.5rem; /* Même position que desktop */
-        width: 1rem;
+        left: 0.8rem; /* Même position que desktop */
+        width: 1.5rem;
+        text-align: center;
+        font-size: 1.1em;
     }
     
     .card-detail.open {
