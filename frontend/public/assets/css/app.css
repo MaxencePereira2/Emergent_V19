@@ -747,47 +747,120 @@ body::before {
     }
 }
 
-/* Responsive mobile */
+/* Enhanced Mobile Responsive Design for Pricing Section */
 @media (max-width: 768px) {
-    .pricing-grid {
-        grid-template-columns: 1fr;
-        gap: 1.5rem;
-        padding: 0 1rem;
+    /* Pricing Section Mobile Improvements */
+    #tarifs {
+        padding: 2rem 1rem;
     }
     
-    .pricing-card {
+    .section-intro {
+        font-size: 1.1rem;
+        line-height: 1.6;
+        margin-bottom: 2.5rem;
+        text-align: center;
+        padding: 0 0.5rem;
+    }
+    
+    .pricing-subsection {
+        margin-bottom: 3rem;
+    }
+    
+    .subsection-title {
+        font-size: 1.4rem;
+        margin-bottom: 2rem;
+        padding: 0 0.5rem;
+        line-height: 1.3;
+    }
+    
+    .pricing-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        padding: 0;
         margin: 0;
     }
     
+    .pricing-card {
+        margin: 0 0.5rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+    }
+    
     .card-header {
-        padding: 1.5rem 1.5rem 1rem;
+        padding: 2rem 1.5rem 1.5rem;
+        text-align: center;
+    }
+    
+    .card-header h4 {
+        font-size: 1.3rem;
+        margin-bottom: 0.5rem;
+        line-height: 1.2;
+    }
+    
+    .card-subtitle {
+        font-size: 0.95rem;
+        margin-bottom: 1rem;
+        opacity: 0.8;
+    }
+    
+    .price-tag {
+        font-size: 1.6rem;
+        margin-bottom: 0.5rem;
+        line-height: 1.1;
+    }
+    
+    .price-tag span {
+        font-size: 1rem;
+    }
+    
+    .price-alt, .price-range {
+        font-size: 0.9rem;
+        margin-top: 0.5rem;
     }
     
     .card-summary {
-        padding: 0 1.5rem 1rem;
+        padding: 0 1.5rem 1.5rem;
+        font-size: 1rem;
+        line-height: 1.5;
+        text-align: center;
     }
     
     .card-toggle {
-        padding: 1rem 1.5rem;
+        padding: 1.2rem 1.5rem;
+        font-size: 1rem;
+        border-top: 1px solid rgba(166, 115, 85, 0.1);
+        background: rgba(255, 255, 255, 0.5);
     }
     
     .detail-columns {
         grid-template-columns: 1fr;
-        gap: 1.5rem;
+        gap: 2rem;
+        text-align: left; /* Fix text alignment issue */
+    }
+    
+    .detail-left h5,
+    .detail-right h5 {
+        font-size: 1rem;
+        margin-bottom: 1rem;
+        text-align: left; /* Ensure consistent alignment */
+    }
+    
+    .detail-columns ul {
+        text-align: left; /* Fix text alignment issue */
+    }
+    
+    .detail-columns li {
+        font-size: 0.95rem;
+        line-height: 1.5;
+        padding: 0.6rem 0;
+        text-align: left; /* Fix text alignment issue */
     }
     
     .card-detail.open {
-        padding: 1.5rem;
-        max-height: 600px;
-    }
-    
-    .price-tag {
-        font-size: 1.5rem;
-    }
-    
-    .subsection-title {
-        font-size: 1.3rem;
-        margin-bottom: 1.5rem;
+        padding: 2rem 1.5rem;
+        max-height: 800px;
+        background: rgba(255, 255, 255, 0.3);
     }
 }
 
