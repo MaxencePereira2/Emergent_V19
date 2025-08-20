@@ -443,13 +443,21 @@ body::before {
     background: linear-gradient(90deg, var(--copper), var(--warm-beige)); /* Même ligne pour tous */
 }
 
-/* Grille des cartes tarifs - style premium */
+/* Grille des cartes tarifs - 3 colonnes pour réduire l'espace */
 .pricing-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-    gap: 2rem;
+    grid-template-columns: repeat(3, 1fr); /* Force 3 colonnes */
+    gap: 1.5rem; /* Réduit l'espace entre les cartes */
     max-width: 1200px;
     margin: 0 auto;
+}
+
+/* Responsive : retour à 2 colonnes sur tablette */
+@media (max-width: 1024px) and (min-width: 769px) {
+    .pricing-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 2rem;
+    }
 }
 
 /* Carte tarif - design haut de gamme gracz.fr */
